@@ -82,7 +82,11 @@ def compute_confluence(ratings_df):
     weight_total = available.mul(weights, axis=1).sum(axis=1)
     raw_score = (weighted_sum / weight_total).where(weight_total > 0)
 
-    insider_nudge = df.get("insider_buying_flag", 0).fillna(0) * INSIDER_BUY_NUDGE
+    # df.get(..., 0) falls back to a literal int when the column is absent
+    # entirely (as opposed to present-but-empty), and int has no .fillna --
+    # go through reindex instead so a caller without an insider stage (e.g.
+    # an ad-hoc snapshot) gets a proper all-NaN Series rather than a crash.
+    insider_nudge = df.reindex(columns=["insider_buying_flag"]).iloc[:, 0].fillna(0) * INSIDER_BUY_NUDGE
     score = (raw_score + insider_nudge).clip(lower=1, upper=5)
     df["recommendation_score"] = score.where(df["core_indicators_available"] >= MIN_CORE_INDICATORS)
 
