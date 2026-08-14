@@ -1,0 +1,43 @@
+politician_name,chamber,symbol,action,amount_range,trans_date,date_precision,disclosed_date,notes,source_url
+Nancy Pelosi,House,NVDA,buy,"$1,000,001-$5,000,000",2023-11-22,exact,2023-12-21,"50 call options, $120 strike, exp 12/20/24",https://www.newsweek.com/nancy-pelosi-sells-nvidia-stock-weeks-before-price-drop-costs-tech-stock-billions-2021725
+Nancy Pelosi,House,NVDA,buy,,2024-06-26,exact,,"10,000 shares (Paul Pelosi)",https://www.benzinga.com/markets/24/07/40077621/nancy-pelosi-loads-up-on-more-nvidia-shares-sells-part-of-microsoft-stake-before-q4-earnings
+Nancy Pelosi,House,NVDA,buy,,2024-07-26,exact,,"10,000 shares (Paul Pelosi)",https://www.benzinga.com/markets/24/07/40077621/nancy-pelosi-loads-up-on-more-nvidia-shares-sells-part-of-microsoft-stake-before-q4-earnings
+Nancy Pelosi,House,NVDA,sell,"$1,000,001-$5,000,000",2024-12-31,exact,,"10,000 shares (Paul Pelosi)",https://www.foxbusiness.com/politics/nancy-pelosi-sells-nvidia-apple-buys-alphabet-amazon
+Nancy Pelosi,House,AAPL,sell,"$5,000,001-$25,000,000",2024-12-31,exact,,"31,600 shares",https://www.foxbusiness.com/politics/nancy-pelosi-sells-nvidia-apple-buys-alphabet-amazon
+Nancy Pelosi,House,MSFT,sell,,2024-07-01,month,,"reported alongside Jul-2024 NVDA buy",https://www.benzinga.com/markets/24/07/40077621/nancy-pelosi-loads-up-on-more-nvidia-shares-sells-part-of-microsoft-stake-before-q4-earnings
+Josh Gottheimer,House,MSFT,sell,"$1,000,001-$5,000,000",2024-11-01,month,,,https://responsiblestatecraft.org/congress-defense-stocks/
+Sheldon Whitehouse,Senate,HSY,buy,,2025-11-21,exact,,,https://www.benzinga.com/news/politics/25/12/49175779/senator-buys-coca-cola-hersheys-stock-after-selling-magnificent-seven-stocks-in-2025
+Sheldon Whitehouse,Senate,KO,buy,,2025-11-21,exact,,,https://www.benzinga.com/news/politics/25/12/49175779/senator-buys-coca-cola-hersheys-stock-after-selling-magnificent-seven-stocks-in-2025
+Sheldon Whitehouse,Senate,GH,buy,,2025-11-21,exact,,,https://www.benzinga.com/news/politics/25/12/49175779/senator-buys-coca-cola-hersheys-stock-after-selling-magnificent-seven-stocks-in-2025
+Sheldon Whitehouse,Senate,AAPL,sell,,2025-06-01,year,,"date approximate, ""earlier in 2025""",https://www.benzinga.com/news/politics/25/12/49175779/senator-buys-coca-cola-hersheys-stock-after-selling-magnificent-seven-stocks-in-2025
+Sheldon Whitehouse,Senate,NVDA,sell,,2025-06-01,year,,"date approximate, ""earlier in 2025""",https://www.benzinga.com/news/politics/25/12/49175779/senator-buys-coca-cola-hersheys-stock-after-selling-magnificent-seven-stocks-in-2025
+Sheldon Whitehouse,Senate,MSFT,sell,,2025-09-01,month,,,https://www.benzinga.com/news/politics/25/12/49175779/senator-buys-coca-cola-hersheys-stock-after-selling-magnificent-seven-stocks-in-2025
+Bernie Moreno,Senate,BEEP,sell,"$15,000-$50,000",2025-03-01,month,,"Mobile Infrastructure Corp",https://www.benzinga.com
+Nancy Pelosi,House,NVDA,buy,"$250,000-$500,000",2025-01-17,month,,"Paul Pelosi, days before Trump inauguration",https://www.notus.org/money/nvidia-stock-trades-congress-pelosi-khanna-mcclain-cleo-fields
+Nancy Pelosi,House,NVDA,sell,,2025-12-24,exact,,"Paul Pelosi, up to $5,000,000",https://www.notus.org/money/nvidia-stock-trades-congress-pelosi-khanna-mcclain-cleo-fields
+Nancy Pelosi,House,NVDA,sell,,2025-12-01,month,,"20,000 shares -- may overlap with the Dec 24 Paul Pelosi sale above",https://www.notus.org/money/nvidia-stock-trades-congress-pelosi-khanna-mcclain-cleo-fields
+Nancy Pelosi,House,NVDA,buy,,2025-12-01,month,,"20 call options, $100 strike, exp Jan 2027",https://www.notus.org/money/nvidia-stock-trades-congress-pelosi-khanna-mcclain-cleo-fields
+Nancy Pelosi,House,AVGO,buy,,2025-12-23,exact,,"Paul Pelosi, 20,000 shares, $80 strike",https://www.notus.org/money/nvidia-stock-trades-congress-pelosi-khanna-mcclain-cleo-fields
+Ro Khanna,House,NVDA,buy,"$15,000-$50,000 each x47",2025-11-01,year,,"47 separate purchases spanning Oct 2025-Jan 2026",https://www.notus.org/money/nvidia-stock-trades-congress-pelosi-khanna-mcclain-cleo-fields
+Ro Khanna,House,PLTR,buy,,2025-06-01,year,,"12 purchases after joining Armed Services Committee",https://www.notus.org/money/nvidia-stock-trades-congress-pelosi-khanna-mcclain-cleo-fields
+Unknown House member,House,NVDA,buy,"$1,000,001-$5,000,000",2025-06-26,exact,2025-07-01,"member name not specified in source",https://www.forbes.com/sites/zacheverson/2025/12/24/congress-million-dollar-stock-trades-2025/
+April McClain Delaney,House,ENTG,buy,,2025-04-01,month,,,https://www.benzinga.com/topic/congress-trades
+Thomas Kean Jr,House,TXN,buy,"$1,000-$15,000",2025-04-01,month,,,https://www.benzinga.com/topic/congress-trades
+Josh Gottheimer,House,GLW,buy,"$16,016-$240,000",2025-05-22,exact,,,https://benzinga.com/z/45907522
+Richard McCormick,House,LHX,buy,"$1,000-$15,000",2025-06-01,month,,"2 separate transactions, each in this range",https://www.benzinga.com/topic/congress-trades
+Sara Jacobs,House,QCOM,sell,"$500,001-$1,000,000",2026-05-06,exact,,,https://finance.yahoo.com/markets/stocks/articles/congress-trading-laws-pass-perfectly-145255073.html
+Chip Roy,House,AESI,sell,"$100,001-$250,000",2026-05-13,exact,,,https://finance.yahoo.com/markets/stocks/articles/congress-trading-laws-pass-perfectly-145255073.html
+Daniel Meuser,House,NVDA,sell,,2026-05-01,year,,"5 partial sales during Mar31-Jul2 2026 window",https://finance.yahoo.com/markets/stocks/articles/congress-trading-laws-pass-perfectly-145255073.html
+Gary Peters,Senate,T,buy,"$1,001-$15,000",2026-06-29,exact,2026-07-02,,https://www.benzinga.com/government/26/07/60266082/senator-just-bought-15k-t-stock
+Alan Armstrong,Senate,WMB,sell,"$6,400,000-$28,400,000",2026-06-24,exact,,,https://www.benzinga.com/government/26/07/60610986/senator-just-sold-28-36m-williams-companies-stock
+Alan Armstrong,Senate,NBIS,buy,"$1,000-$15,000",2026-03-30,exact,,,https://www.benzinga.com/government/26/07/60610986/senator-just-sold-28-36m-williams-companies-stock
+Sheldon Whitehouse,Senate,LOW,sell,"$1,001-$15,000",2026-07-20,exact,,,https://www.benzinga.com/government/26/08/60911866/congressional-trading-report-sen-sheldon-whitehouse-sold-over-1k-lowe-s-companies-stock
+Josh Gottheimer,House,GOOGL,buy,"$8,008-$120,000",2026-07-24,exact,,,https://www.benzinga.com/government/26/08/61114113/congress-member-bought-120k-alphabet-stock-here-s-what-you-need-know
+John McGuire,House,BLK,sell,"$3,003-$45,000",2026-07-10,exact,,,https://www.benzinga.com/government/26/08/61114114/house-representative-just-sold-45k-blackrock-stock
+Christian Menefee,House,PINS,sell,"$15,001-$50,000",2026-08-07,exact,,,https://www.benzinga.com/government/26/08/61078993/congress-member-sold-50k-pinterest-stock-here-s-what-you-need-know
+Jonathan Jackson,House,V,sell,"$67,004-$180,000",2026-04-24,exact,,,https://www.benzinga.com/insights/government/26/05/52843154/a-congress-member-sold-up-to-180k-in-visa-stock-heres-what-you-need-to-know
+Gilbert Cisneros,House,PLTR,sell,,2026-05-15,exact,,,https://pelositracker.app/stock/pltr
+Lisa McClain,House,PLTR,buy,,2026-06-01,year,,"date approximate, ""in the last year"" per Jul-2026 article",https://www.cnbc.com/2026/07/28/spacex-stock-congress-lawmakers-ipo-conflict-of-interest.html
+Jefferson Shreve,House,PLTR,buy,,2026-06-01,year,,"date approximate, ""in the last year"" per Jul-2026 article",https://www.cnbc.com/2026/07/28/spacex-stock-congress-lawmakers-ipo-conflict-of-interest.html
+Rob Bresnahan,House,PLTR,buy,,2026-06-01,year,,"date approximate, ""in the last year"" per Jul-2026 article",https://www.cnbc.com/2026/07/28/spacex-stock-congress-lawmakers-ipo-conflict-of-interest.html
+Cleo Fields,House,PLTR,buy,,2026-06-01,year,,"date approximate, ""in the last year"" per Jul-2026 article",https://www.cnbc.com/2026/07/28/spacex-stock-congress-lawmakers-ipo-conflict-of-interest.html

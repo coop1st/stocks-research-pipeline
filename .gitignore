@@ -1,0 +1,26 @@
+# The full historical database is 2GB+ and entirely regenerable from free
+# public sources -- it stays local, never goes to GitHub. Only small
+# derived exports (weekly price deltas, ratings, recommendations) get
+# published; see data/github_sync/.
+data/db/*.db
+data/db/*.db-wal
+data/db/*.db-shm
+data/db/*.log
+
+# Operational logs from scheduled runs -- local only.
+data/logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Local environment / secrets (none currently checked in, but keep this
+# guard in place -- SEC_CONTACT_EMAIL and any future credentials should
+# only ever live in OS environment variables or a local, gitignored .env).
+.env
+.env.local
+
+# Editor/OS cruft
+.DS_Store
+Thumbs.db

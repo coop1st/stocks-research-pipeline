@@ -1,0 +1,6 @@
+yfinance
+requests
+pandas
+tenacity
+scipy
+truststore
