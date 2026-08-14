@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pipeline"))
 import pandas as pd
 from db import get_connection
 
+from confluence import compute_confluence
 from congress_flag import load_congress_transactions, rate_congress_buying, rate_congress_selling
 from insider_flag import rate_insider_buying
 from momentum import rate_momentum
@@ -50,6 +51,11 @@ CREATE TABLE IF NOT EXISTS ratings (
     insider_cluster_buy_count INTEGER,
     congress_buy_flag INTEGER,
     congress_sell_flag INTEGER,
+    recommendation TEXT,
+    recommendation_score REAL,
+    bullish_count INTEGER,
+    bearish_count INTEGER,
+    core_indicators_available INTEGER,
     PRIMARY KEY (symbol, as_of_date)
 );
 """
@@ -126,11 +132,14 @@ def compute_and_store():
             merged[col] = 0 if col.endswith("_flag") or col in ("golden_cross", "death_cross") else None
 
     merged["as_of_date"] = as_of_date
+    merged = compute_confluence(merged)
+
     cols = [
         "symbol", "as_of_date", "valuation_rating", "valuation_composite", "trend_rating",
         "golden_cross", "death_cross", "momentum_rating", "quality_rating", "rsi_rating", "rsi_14",
         "range52w_rating", "range_position_52w", "insider_buying_flag", "insider_cluster_buy_count",
         "congress_buy_flag", "congress_sell_flag",
+        "recommendation", "recommendation_score", "bullish_count", "bearish_count", "core_indicators_available",
     ]
     merged = merged[cols]
 

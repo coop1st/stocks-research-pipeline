@@ -1,0 +1,48 @@
+name: Weekly price fetch
+
+# Runs entirely in the cloud -- no local machine needed. Fetches a fixed
+# trailing window of prices for the whole universe (see
+# cloud/fetch_weekly_prices.py for why this can't use the DB-diffing
+# incremental logic the local pipeline uses) and commits the result as a
+# small dated CSV. The local pipeline picks this up later, whenever that
+# machine is next on, and merges it into the real historical database.
+
+on:
+  schedule:
+    # Saturday 13:00 UTC (~8-9am US Eastern depending on DST), a few hours
+    # ahead of the local weekly job so the data's ready when picked up.
+    - cron: "0 13 * * 6"
+  workflow_dispatch: {}  # allows manual triggering from the Actions tab / gh CLI
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r pipeline/requirements.txt
+
+      - name: Fetch weekly prices
+        env:
+          SEC_CONTACT_EMAIL: ${{ secrets.SEC_CONTACT_EMAIL }}
+        run: python cloud/fetch_weekly_prices.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/github_sync/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Weekly price data: $(date -u +%Y-%m-%d)"
+            git push
+          fi

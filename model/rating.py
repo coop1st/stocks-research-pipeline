@@ -44,7 +44,7 @@ def add_rating(snap, n_buckets=5):
     labels = list(range(n_buckets, 0, -1))  # ascending composite -> descending rating
     snap.loc[valid, "rating"] = pd.qcut(
         snap.loc[valid, "composite"], n_buckets, labels=labels, duplicates="drop"
-    )
+    ).astype(float)
     return snap
 
 

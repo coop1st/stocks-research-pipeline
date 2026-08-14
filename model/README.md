@@ -17,6 +17,18 @@ indicator alone. Currently built:
 | Insider buying | `insider_flag.py` | boolean 1/0: insider open-market purchase disclosed in trailing 6 months | No -- event flag, not a 1-5 rating |
 | Congress buy/sell | `congress_flag.py` | two booleans: member of Congress bought/sold, trailing 6 months | No -- event flags; hand-compiled, unvalidated, not fed into confluence |
 
+**Combining them**: `confluence.py` turns the 8 indicators into one
+recommendation (STRONG BUY / BUY / HOLD / SELL / STRONG SELL) per ticker,
+weighted by each indicator's *validated* |IC| (valuation 0.26, 52-week
+range 0.20, momentum 0.15, quality 0.15, trend 0.09) rather than a naive
+majority vote -- RSI (~0 validated IC) and congress trading (never
+validated) are shown as context but don't move the score; insider buying
+gets a small fixed nudge rather than a full weighted vote, since it's a
+boolean not a continuous rating. Needs at least 3 of the 5 weighted
+indicators present to produce a recommendation at all. `compute_all_ratings.py`
+runs every indicator plus confluence and persists one row per ticker into
+the `ratings` table (this is what the weekly scheduled job calls).
+
 ---
 
 ## Valuation indicator
