@@ -14,15 +14,23 @@ needed a paid API key; this version scores sentiment only for categories
 actually represented in that week's shortlist, so the cost of folding it
 into the local step is small.
 
-The top/bottom-15 shortlist itself is computed here in pandas, not by the
-agent: a first real test run found the full STRONG BUY/STRONG SELL bucket
-can be 1,000+ tickers with many exact ties (every core indicator maxed
-out), which the agent couldn't reliably sort/filter within its given
-tools (Read/Glob/WebSearch/create_draft) and had to improvise around with
+The shortlist itself is computed here in pandas, not by the agent: a
+first real test run found the full STRONG BUY/STRONG SELL bucket can be
+1,000+ tickers with many exact ties (every core indicator maxed out),
+which the agent couldn't reliably sort/filter within its given tools
+(Read/Glob/WebSearch/create_draft) and had to improvise around with
 Grep. Doing the filtering deterministically in Python and handing the
 agent a short, pre-resolved list removes that ambiguity, so its tool
 scope no longer needs file access at all -- just WebSearch and the Gmail
 draft tool.
+
+The filter itself (see build_shortlist) isn't a top-N cut anymore -- it
+requires STRONG BUY/STRONG SELL by the weighted recommendation_score AND
+agreement from the three most individually-informative core indicators
+(valuation, momentum, quality) each independently at their own extreme
+threshold. That shrank a same-day test from 701 STRONG BUY / 494 STRONG
+SELL down to 15 / 40 -- a small enough, high-conviction-enough list that
+capping it further wasn't needed or wanted.
 
 Runs as the last stage of the weekly job, after ratings are published, so
 it's isolated the same way every other stage is: if this fails (e.g. no
@@ -39,7 +47,20 @@ RATINGS_DIR = PROJECT_DIR / "data" / "github_sync" / "ratings"
 RECIPIENT = "kcoopercscs@gmail.com"
 ALLOWED_TOOLS = "WebSearch,mcp__claude_ai_Gmail__create_draft"
 CLAUDE_TIMEOUT_S = 1800
-SHORTLIST_SIZE = 15  # per direction -- matches model/confluence.py's own "best/worst 15" convention
+
+# Thresholds match the 1-5 rating convention everywhere else (1=bullish,
+# 5=bearish) and the bands confluence.py itself uses for STRONG BUY/SELL.
+BUY_VALUATION_MAX = 1.75
+BUY_MOMENTUM_MAX = 1.75
+BUY_QUALITY_MAX = 2.5
+SELL_VALUATION_MIN = 4.25
+SELL_MOMENTUM_MIN = 4.25
+SELL_QUALITY_MIN = 3.5
+
+SHORTLIST_COLS = [
+    "symbol", "recommendation", "recommendation_score", "industry_category",
+    "valuation_rating", "momentum_rating", "quality_rating",
+]
 
 
 def _latest_file(directory):
@@ -55,10 +76,19 @@ def build_shortlist():
         raise RuntimeError(f"No ratings CSV found under {RATINGS_DIR}")
 
     df = pd.read_csv(ratings_path)
-    buys = df[df["recommendation"] == "STRONG BUY"].nsmallest(SHORTLIST_SIZE, "recommendation_score")
-    sells = df[df["recommendation"] == "STRONG SELL"].nlargest(SHORTLIST_SIZE, "recommendation_score")
-    cols = ["symbol", "recommendation", "recommendation_score", "industry_category"]
-    shortlist = pd.concat([buys[cols], sells[cols]], ignore_index=True)
+    buys = df[
+        (df["recommendation"] == "STRONG BUY")
+        & (df["valuation_rating"] < BUY_VALUATION_MAX)
+        & (df["momentum_rating"] < BUY_MOMENTUM_MAX)
+        & (df["quality_rating"] < BUY_QUALITY_MAX)
+    ]
+    sells = df[
+        (df["recommendation"] == "STRONG SELL")
+        & (df["valuation_rating"] > SELL_VALUATION_MIN)
+        & (df["momentum_rating"] > SELL_MOMENTUM_MIN)
+        & (df["quality_rating"] > SELL_QUALITY_MIN)
+    ]
+    shortlist = pd.concat([buys[SHORTLIST_COLS], sells[SHORTLIST_COLS]], ignore_index=True)
     return ratings_path, shortlist
 
 
@@ -73,9 +103,13 @@ def build_prompt():
     return f"""You are drafting this week's stock recommendation email. Work
 through these steps and don't stop until a Gmail draft has been created.
 
-This week's shortlist (already filtered and capped to the top 15 STRONG
-BUY and top 15 STRONG SELL by recommendation_score, from
-{ratings_path.name}; recommendation_score is 1-5, 1=bullish/5=bearish):
+This week's shortlist, from {ratings_path.name} (recommendation_score is
+1-5, 1=bullish/5=bearish; same convention for valuation/momentum/quality
+ratings). Already filtered to high-conviction picks: STRONG BUY/STRONG
+SELL by the weighted recommendation_score AND all three of valuation,
+momentum, and quality individually agreeing at their own extreme
+threshold (valuation/momentum <1.75 and quality <2.5 for buys;
+valuation/momentum >4.25 and quality >3.5 for sells):
 
 {shortlist_block}
 
@@ -100,12 +134,18 @@ Steps:
    run counter to the model's call.
 4. Draft (do NOT send) a Gmail email to {RECIPIENT} using the
    create_draft tool. Subject: "Weekly stock picks -- <this week's
-   date>". Body: for each shortlisted ticker, its recommendation, score,
-   industry category + sentiment context, and any notable headline found
-   in step 3. Keep it concise and scannable -- this is a personal
-   research email, not a formal report. If the shortlist is empty (either
-   from the start or after exclusions), still draft a short email saying
-   so.
+   date>". Structure the body in two top-level sections, "Buys" and
+   "Sells", and within each section group tickers by industry_category
+   (a subheading per category, tickers listed under it) rather than one
+   flat list -- multiple tickers in the shortlist often share a category,
+   and grouping makes any shared industry-sentiment context easy to read
+   once instead of repeated per ticker. Under each ticker: its
+   recommendation_score and the three individual ratings that qualified
+   it, plus any notable headline found in step 3. Mention each category's
+   sentiment score/rationale once, at the top of that category's group.
+   Keep it concise and scannable -- this is a personal research email,
+   not a formal report. If the shortlist is empty (either from the start
+   or after exclusions), still draft a short email saying so.
 
 Use only the tools you've been given (WebSearch and the Gmail
 create_draft tool) -- everything you need besides web search is already
