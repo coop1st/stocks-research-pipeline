@@ -68,7 +68,13 @@ def compute_confluence(ratings_df):
     core_cols = list(CORE_WEIGHTS.keys())
 
     weights = pd.Series(CORE_WEIGHTS)
-    values = df[core_cols]
+    # Coerce explicitly: a core column that's entirely missing for every
+    # ticker (e.g. moving_averages not yet recomputed for today) comes out
+    # of the merge as object dtype full of None rather than float64 NaN,
+    # which turns the arithmetic below into elementwise Python division and
+    # raises a real ZeroDivisionError for any 0/0 row instead of producing
+    # NaN the way vectorized numeric division would.
+    values = df[core_cols].apply(pd.to_numeric, errors="coerce")
     available = values.notna()
     df["core_indicators_available"] = available.sum(axis=1)
 

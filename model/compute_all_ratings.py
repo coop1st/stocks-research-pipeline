@@ -69,9 +69,20 @@ def _left_merge(base, other, cols, rename=None):
     return base.merge(other, on="symbol", how="left")
 
 
+def _ensure_industry_category_column(conn):
+    # RATINGS_SCHEMA's CREATE TABLE IF NOT EXISTS is a no-op on a `ratings`
+    # table that already existed before industry_category was added to the
+    # schema (i.e. any local DB created before that change) -- migrate it
+    # explicitly rather than crashing on every run on such a machine.
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(ratings)").fetchall()}
+    if "industry_category" not in cols:
+        conn.execute("ALTER TABLE ratings ADD COLUMN industry_category TEXT")
+
+
 def compute_and_store():
     with get_connection() as conn:
         conn.executescript(RATINGS_SCHEMA)
+        _ensure_industry_category_column(conn)
 
     valuation, as_of_date, _weights, _avg_ic = rate_today()
 
