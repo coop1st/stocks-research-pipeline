@@ -93,3 +93,70 @@ DURATION_METRICS = {
     "eps_diluted", "revenue", "net_income", "operating_income",
     "operating_cash_flow", "gross_profit",
 }
+
+# SEC SIC code (Standard Industrial Classification) ranges bucketed into a
+# manageable set of ~25 categories for the industry-sentiment overlay --
+# raw SIC has ~1,000 codes, far too granular to hand-score sentiment on
+# weekly. Ranges are inclusive (low, high, category). Checked in order;
+# first match wins. Anything unmatched falls into "Other".
+SIC_CATEGORY_RANGES = [
+    (100, 999, "Agriculture"),
+    (1000, 1099, "Mining & Minerals"),
+    (1200, 1299, "Coal Mining"),
+    (1300, 1399, "Oil & Gas"),
+    (1400, 1499, "Mining & Minerals"),
+    (1500, 1799, "Construction & Materials"),
+    (2000, 2199, "Food & Beverage"),
+    (2200, 2399, "Apparel & Textiles"),
+    (2400, 2599, "Wood & Furniture"),
+    (2600, 2699, "Paper"),
+    (2700, 2799, "Publishing & Media"),
+    (2830, 2836, "Pharmaceuticals & Biotech"),
+    (2800, 2899, "Chemicals"),
+    (2900, 2999, "Oil & Gas"),
+    (3000, 3199, "Rubber, Plastics & Leather"),
+    (3200, 3299, "Construction & Materials"),
+    (3300, 3399, "Metals"),
+    (3400, 3499, "Industrial Machinery"),
+    (3570, 3579, "Computer Hardware"),
+    (3672, 3679, "Semiconductors & Chips"),
+    (3500, 3699, "Industrial Machinery"),
+    (3700, 3719, "Automobiles"),
+    (3720, 3729, "Aerospace & Defense"),
+    (3760, 3769, "Aerospace & Defense"),
+    (3700, 3799, "Transportation Equipment"),
+    (3800, 3899, "Medical Devices & Instruments"),
+    (3900, 3999, "Misc Manufacturing"),
+    (4000, 4099, "Railroads"),
+    (4500, 4599, "Airlines"),
+    (4000, 4799, "Transportation & Logistics"),
+    (4800, 4899, "Telecom & Media"),
+    (4900, 4999, "Utilities"),
+    (5000, 5199, "Wholesale Trade"),
+    (5200, 5999, "Retail"),
+    (6000, 6199, "Banks & Financial Services"),
+    (6200, 6299, "Investment & Brokerage"),
+    (6300, 6499, "Insurance"),
+    (6500, 6599, "Real Estate & REITs"),
+    (6700, 6799, "Investment & Holding Companies"),
+    (7370, 7379, "Technology & Software"),
+    (7000, 7099, "Hospitality & Leisure"),
+    (7800, 7999, "Hospitality & Leisure"),
+    (8000, 8099, "Healthcare Services"),
+    (8700, 8799, "Business & Research Services"),
+    (7000, 8999, "Services"),
+    (9000, 9999, "Public Administration"),
+]
+
+
+def sic_to_category(sic_code):
+    if not sic_code:
+        return "Other"
+    try:
+        code = int(sic_code)
+    except (TypeError, ValueError):
+        return "Other"
+    for low, high, category in SIC_CATEGORY_RANGES:
+        if low <= code <= high:
+            return category
+    return "Other"

@@ -36,6 +36,7 @@ RATINGS_SCHEMA = """
 CREATE TABLE IF NOT EXISTS ratings (
     symbol TEXT NOT NULL,
     as_of_date TEXT NOT NULL,
+    industry_category TEXT,
     valuation_rating REAL,
     valuation_composite REAL,
     trend_rating REAL,
@@ -77,6 +78,12 @@ def compute_and_store():
     merged = valuation[["symbol", "rating", "composite"]].rename(
         columns={"rating": "valuation_rating", "composite": "valuation_composite"}
     )
+
+    with get_connection() as conn:
+        industry = pd.read_sql_query(
+            "SELECT symbol, industry_category FROM tickers WHERE industry_category IS NOT NULL", conn
+        )
+    merged = merged.merge(industry, on="symbol", how="left")
 
     trend = rate_trend(as_of_date)
     if not trend.empty:
@@ -135,7 +142,7 @@ def compute_and_store():
     merged = compute_confluence(merged)
 
     cols = [
-        "symbol", "as_of_date", "valuation_rating", "valuation_composite", "trend_rating",
+        "symbol", "as_of_date", "industry_category", "valuation_rating", "valuation_composite", "trend_rating",
         "golden_cross", "death_cross", "momentum_rating", "quality_rating", "rsi_rating", "rsi_14",
         "range52w_rating", "range_position_52w", "insider_buying_flag", "insider_cluster_buy_count",
         "congress_buy_flag", "congress_sell_flag",

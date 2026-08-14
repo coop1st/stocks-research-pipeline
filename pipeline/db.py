@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS tickers (
     security_type TEXT,
     cik TEXT,
     is_active INTEGER DEFAULT 1,
-    updated_at TEXT
+    updated_at TEXT,
+    industry_sic TEXT,
+    industry_sic_description TEXT,
+    industry_category TEXT
 );
 
 CREATE TABLE IF NOT EXISTS prices (
@@ -116,9 +119,27 @@ def get_connection():
         conn.close()
 
 
+# (column, definition) pairs added after the initial schema -- CREATE TABLE
+# IF NOT EXISTS doesn't alter an already-existing table, so new columns need
+# an explicit migration for databases created before they were added.
+_MIGRATIONS = [
+    ("tickers", "industry_sic", "TEXT"),
+    ("tickers", "industry_sic_description", "TEXT"),
+    ("tickers", "industry_category", "TEXT"),
+]
+
+
+def _run_migrations(conn):
+    for table, column, coltype in _MIGRATIONS:
+        existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+        if column not in existing:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {coltype}")
+
+
 def init_db():
     with get_connection() as conn:
         conn.executescript(SCHEMA)
+        _run_migrations(conn)
 
 
 def upsert_tickers(rows):
@@ -135,6 +156,21 @@ def upsert_tickers(rows):
                 cik=excluded.cik,
                 is_active=1,
                 updated_at=datetime('now')
+            """,
+            rows,
+        )
+
+
+def upsert_industry_classification(rows):
+    """rows: iterable of dicts with symbol, industry_sic, industry_sic_description, industry_category"""
+    with get_connection() as conn:
+        conn.executemany(
+            """
+            UPDATE tickers SET
+                industry_sic=:industry_sic,
+                industry_sic_description=:industry_sic_description,
+                industry_category=:industry_category
+            WHERE symbol=:symbol
             """,
             rows,
         )

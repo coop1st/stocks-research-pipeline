@@ -20,6 +20,7 @@ from compute_moving_averages import compute_and_store as compute_moving_averages
 from compute_price_indicators import compute_and_store as compute_price_indicators
 from db import get_universe, init_db, upsert_tickers
 from fetch_fundamentals import fetch_fundamentals_for
+from fetch_industry_classification import fetch_industry_classification
 from fetch_insider_transactions import fetch_insider_transactions
 from fetch_prices import fetch_prices_for
 from universe import build_universe
@@ -66,6 +67,16 @@ def run_fundamentals_stage(symbol_cik_pairs):
     return result
 
 
+def run_industry_stage(tickers):
+    # Stable for years at a time -- monthly cadence, same reasoning as
+    # fundamentals.
+    pairs = [(t["symbol"], t["cik"]) for t in tickers if t["cik"]]
+    print(f"[industry] fetching SEC SIC classification for {len(pairs)} tickers...")
+    result = fetch_industry_classification(pairs, verbose=False)
+    print(f"[industry] done: {result}")
+    return result
+
+
 def run_insider_transactions_stage(tickers):
     # Full historical refetch every time (~2-3 min for the whole universe,
     # cheap enough not to bother with incremental logic) -- SEC publishes
@@ -80,7 +91,7 @@ def run_insider_transactions_stage(tickers):
 
 ALL_STAGES = (
     "universe", "prices", "moving_averages", "price_indicators",
-    "fundamentals", "insider_transactions",
+    "fundamentals", "industry", "insider_transactions",
 )
 
 # Stages worth running on a weekly cadence: universe (cheap, catches new
@@ -126,7 +137,7 @@ def main():
     if "price_indicators" in active_stages:
         run_price_indicators_stage()
 
-    needs_tickers = active_stages & {"prices", "fundamentals", "insider_transactions"}
+    needs_tickers = active_stages & {"prices", "fundamentals", "industry", "insider_transactions"}
     if needs_tickers:
         tickers = get_universe()
         if not tickers:
@@ -141,6 +152,9 @@ def main():
         if "fundamentals" in active_stages:
             pairs = [(t["symbol"], t["cik"]) for t in tickers if t["cik"]]
             run_fundamentals_stage(pairs)
+
+        if "industry" in active_stages:
+            run_industry_stage(tickers)
 
         if "insider_transactions" in active_stages:
             run_insider_transactions_stage(tickers)

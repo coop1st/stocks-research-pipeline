@@ -24,6 +24,11 @@ changes materially.
 A ticker needs at least MIN_CORE_INDICATORS of the 5 weighted indicators
 present to get a recommendation at all (avoids a confident-looking score
 built from just one or two data points).
+
+Output: recommendation_score, 1-5 (same convention as every individual
+indicator -- 1 = most bullish, 5 = most bearish), plus a human-readable
+recommendation label (STRONG BUY..STRONG SELL) and bullish/bearish
+indicator counts for context.
 """
 import pandas as pd
 

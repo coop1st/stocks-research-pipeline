@@ -20,6 +20,12 @@ completely unattended with nobody watching:
   so "recalculate everything on the new data" covers the scored outputs
   too, not just the raw prices/moving-averages/price-indicators inputs
   they're built from.
+- The weekly run starts by pulling the cloud-fetched price data GitHub
+  Actions gathered since the last time this machine was on (no need to
+  re-fetch what's already sitting there), and ends by publishing the
+  fresh ratings/recommendations snapshot back to GitHub -- that published
+  file is what the separately-scheduled Claude routine reads to draft the
+  weekly recommendation email.
 
 Usage (what the scheduled tasks actually call):
     python scheduled_run.py weekly
@@ -42,6 +48,9 @@ from run_pipeline import (
     run_prices_stage,
     run_universe_stage,
 )
+
+from publish_to_github import publish as publish_ratings
+from pull_github_updates import pull_and_merge
 
 sys.path.insert(0, str(PROJECT_DIR / "model"))
 from compute_all_ratings import compute_and_store as compute_all_ratings  # noqa: E402
@@ -117,7 +126,8 @@ def health_check():
 
 
 def run_weekly():
-    results = [run_stage_safely("universe", run_universe_stage)]
+    results = [run_stage_safely("pull_github_updates", pull_and_merge)]
+    results.append(run_stage_safely("universe", run_universe_stage))
     tickers = get_universe()
     if tickers:
         results.append(run_stage_safely("prices", run_prices_stage, [t["symbol"] for t in tickers]))
@@ -126,6 +136,7 @@ def run_weekly():
     results.append(run_stage_safely("moving_averages", run_moving_averages_stage))
     results.append(run_stage_safely("price_indicators", run_price_indicators_stage))
     results.append(run_stage_safely("ratings", compute_all_ratings))
+    results.append(run_stage_safely("publish_ratings", publish_ratings))
     return results
 
 
