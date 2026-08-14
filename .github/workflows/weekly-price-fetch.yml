@@ -9,9 +9,13 @@ name: Weekly price fetch
 
 on:
   schedule:
-    # Saturday 13:00 UTC (~8-9am US Eastern depending on DST), a few hours
-    # ahead of the local weekly job so the data's ready when picked up.
-    - cron: "0 13 * * 6"
+    # Saturday 03:00 UTC. The local weekly job fires at 11:00am Irish
+    # wall-clock time, which is 10:00 UTC in IST (Mar-Oct) or 11:00 UTC in
+    # GMT (Oct-Mar) -- this runs 7-8 hours ahead of the earlier of those
+    # two, so the cloud snapshot is reliably ready before the local job's
+    # `git pull` picks it up. (Originally this ran at 13:00 UTC, which was
+    # actually *after* the local job when that job ran at 8am -- fixed.)
+    - cron: "0 3 * * 6"
   workflow_dispatch: {}  # allows manual triggering from the Actions tab / gh CLI
 
 permissions:

@@ -23,13 +23,18 @@ completely unattended with nobody watching:
 - The weekly run starts by pulling the cloud-fetched price data GitHub
   Actions gathered since the last time this machine was on (no need to
   re-fetch what's already sitting there), and ends by publishing the
-  fresh ratings/recommendations snapshot back to GitHub -- that published
-  file is what the separately-scheduled Claude routine reads to draft the
-  weekly recommendation email.
+  fresh ratings/recommendations snapshot back to GitHub, then a final
+  stage (draft_weekly_email.py) shells out to `claude -p` for the parts
+  that need real web search + LLM judgment: industry sentiment for
+  categories in that week's shortlist, the exclusion rule, the per-stock
+  headline check, and drafting the Gmail email. That's a local step
+  (reusing the Claude subscription/CLI login already logged in on this
+  machine) rather than a separately-billed cloud API call.
 
 Usage (what the scheduled tasks actually call):
     python scheduled_run.py weekly
     python scheduled_run.py monthly
+    python scheduled_run.py quarterly
 """
 import json
 import sys
@@ -42,6 +47,7 @@ from config import PROJECT_DIR
 from db import get_connection, get_universe, init_db
 from run_pipeline import (
     run_fundamentals_stage,
+    run_industry_stage,
     run_insider_transactions_stage,
     run_moving_averages_stage,
     run_price_indicators_stage,
@@ -49,8 +55,14 @@ from run_pipeline import (
     run_universe_stage,
 )
 
+from draft_weekly_email import run_email_draft_stage
 from publish_to_github import publish as publish_ratings
 from pull_github_updates import pull_and_merge
+from quarterly_validation import (
+    run_backtest_stage,
+    run_validate_indicators_stage,
+    run_validation_summary_stage,
+)
 
 sys.path.insert(0, str(PROJECT_DIR / "model"))
 from compute_all_ratings import compute_and_store as compute_all_ratings  # noqa: E402
@@ -137,6 +149,7 @@ def run_weekly():
     results.append(run_stage_safely("price_indicators", run_price_indicators_stage))
     results.append(run_stage_safely("ratings", compute_all_ratings))
     results.append(run_stage_safely("publish_ratings", publish_ratings))
+    results.append(run_stage_safely("email_draft", run_email_draft_stage))
     return results
 
 
@@ -148,13 +161,27 @@ def run_monthly():
     return [
         run_stage_safely("fundamentals", run_fundamentals_stage, pairs),
         run_stage_safely("insider_transactions", run_insider_transactions_stage, tickers),
+        run_stage_safely("industry", run_industry_stage, tickers),
     ]
+
+
+def run_quarterly():
+    results = [run_stage_safely("backtest", run_backtest_stage)]
+    results.append(run_stage_safely("validate_indicators", run_validate_indicators_stage))
+    today = date.today().isoformat()
+    validation_dir = PROJECT_DIR / "data" / "logs" / "validation"
+    backtest_log = str(validation_dir / f"backtest_{today}.log")
+    validate_log = str(validation_dir / f"validate_indicators_{today}.log")
+    results.append(run_stage_safely(
+        "validation_summary", run_validation_summary_stage, backtest_log, validate_log,
+    ))
+    return results
 
 
 def main():
     run_type = sys.argv[1] if len(sys.argv) > 1 else "weekly"
-    if run_type not in ("weekly", "monthly"):
-        print(f"Unknown run type {run_type!r}, expected 'weekly' or 'monthly'")
+    if run_type not in ("weekly", "monthly", "quarterly"):
+        print(f"Unknown run type {run_type!r}, expected 'weekly', 'monthly', or 'quarterly'")
         sys.exit(1)
 
     LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -167,7 +194,12 @@ def main():
         try:
             init_db()
             start = time.time()
-            results = run_weekly() if run_type == "weekly" else run_monthly()
+            if run_type == "weekly":
+                results = run_weekly()
+            elif run_type == "monthly":
+                results = run_monthly()
+            else:
+                results = run_quarterly()
             warnings = health_check()
             elapsed = time.time() - start
 

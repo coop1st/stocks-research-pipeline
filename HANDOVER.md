@@ -10,8 +10,9 @@ pushed to `main` at https://github.com/coop1st/stocks-research-pipeline
 A free-data stock research pipeline: fetches prices (Yahoo/yfinance) and
 fundamentals/insider trading (SEC EDGAR) for ~5,900 US common stocks,
 computes 8 independent 1-5 rated indicators, combines them into a
-weighted "confluence" recommendation score, and is being wired up to
-produce a weekly recommendation email.
+weighted "confluence" recommendation score, and produces a weekly
+recommendation email (industry-sentiment research, per-stock headline
+check, and Gmail draft all run locally, as part of the same weekly job).
 
 ## Architecture (why things are split the way they are)
 
@@ -70,77 +71,103 @@ produce a weekly recommendation email.
    ticker per week: every indicator's rating, the confluence score,
    industry category. This is what gets exported and published.
 6. **Local weekly automation**: Windows Scheduled Task
-   `StocksPipeline-WeeklyUpdate`, runs Saturdays 8am, calls
+   `StocksPipeline-WeeklyUpdate`, runs Saturdays 11am (Irish time), calls
    `python pipeline/scheduled_run.py weekly`, which: pulls the GitHub
    Actions price snapshot and merges it in
    (`pull_github_updates.py`) → local incremental price fetch as a
    fallback → recomputes moving averages/RSI/52w-range → recomputes all
    ratings + confluence → publishes the snapshot back to GitHub
-   (`publish_to_github.py`). Fully logged (`data/logs/`), has a
-   post-run health check, and every stage is isolated so one failure
+   (`publish_to_github.py`) → drafts the weekly recommendation email
+   (`draft_weekly_email.py`, see below). Fully logged (`data/logs/`), has
+   a post-run health check, and every stage is isolated so one failure
    doesn't kill the rest. Check anytime with `python pipeline/check_status.py`.
-7. **Cloud weekly price fetch**: GitHub Actions workflow, runs
-   Saturdays 13:00 UTC (a few hours ahead of the local job), fetches
-   prices with no local PC needed, commits to the repo. Tested
-   end-to-end successfully (a manual run completed in ~4 minutes with
-   47,205 rows).
-8. **Monthly local automation** (not yet on a Scheduled Task — currently
-   manual): `python pipeline/run_pipeline.py --stage fundamentals` and
-   `--stage insider_transactions` and `--stage industry`.
+7. **Cloud weekly price fetch**: GitHub Actions workflow, runs Saturdays
+   03:00 UTC, fetches prices with no local PC needed, commits to the
+   repo. Tested end-to-end successfully (a manual run completed in ~4
+   minutes with 47,205 rows). **Originally ran at 13:00 UTC, which was
+   actually *after* the local job when that job ran at 8am — fixed** by
+   moving this to 03:00 UTC. The local job has since also moved to 11am
+   Irish time, so the buffer is now 7-8 hours ahead of the local job's
+   earliest possible UTC time (10:00 UTC in IST) year-round.
+8. **Monthly local automation**: Windows Scheduled Task
+   `StocksPipeline-MonthlyUpdate`, every 4 weeks on Saturday at 11:30am
+   Irish time (30 min after the weekly job, so on the Saturdays where
+   they coincide they don't both write to the local SQLite database at
+   once). Calls `python pipeline/scheduled_run.py monthly`, which runs
+   `fundamentals` → `insider_transactions` → `industry` (SEC fundamentals
+   refresh, insider Form 3/4/5 refetch, SIC industry reclassification —
+   all slow-changing enough that weekly cadence would be overkill).
+   Anchored to the same reference week as the weekly task
+   (2026-08-14) so the two stay in phase; first run 2026-08-15.
+9. **Weekly research + Gmail draft**: `pipeline/draft_weekly_email.py`,
+   the last stage of the local weekly job (`email_draft`, runs after
+   `publish_ratings`). See "What's NOT done yet" below for detail and its
+   not-yet-verified-end-to-end status.
+10. **Quarterly model revalidation** (task #34): Windows Scheduled Task
+    `StocksPipeline-QuarterlyValidation`, every 12 weeks on Saturday at
+    1:00pm Irish time (staggered after both the weekly 11:00am and
+    monthly 11:30am jobs on the Saturdays all three coincide — same
+    reference week, so that's every 12th weekly Saturday, first
+    2026-08-15). Calls `python pipeline/scheduled_run.py quarterly`
+    (`pipeline/quarterly_validation.py`), which reruns
+    `model/backtest.py` and `model/validate_indicators.py` against the
+    by-then-larger local dataset, captures their full output to
+    `data/logs/validation/`, then a local `claude -p` stage (same
+    subscription-reuse pattern as the weekly email, no API billing)
+    compares the results against the documented baseline in
+    `model/README.md` and drafts a Gmail summary — still healthy, or
+    something's drifted and worth a look. Not yet verified end-to-end
+    (only compile/import-checked); first real run should be checked in
+    `data/logs/` and the Gmail drafts folder.
 
 ## What's NOT done yet
 
-- **The weekly research + Gmail draft step is unbuilt.** This was being
-  designed when the handover happened. Two features were agreed on but
-  not yet implemented:
-  1. **Per-stock headline check**: for each ticker in that week's STRONG
-     BUY/STRONG SELL shortlist, search recent news and note anything
-     interesting in the eventual email.
-  2. **Industry sentiment score**: for each *category* represented in
-     that week's shortlist (not every category, just the ones with a
-     shortlisted stock), score sentiment 1-5 (same convention: 1 =
-     bullish, 5 = bearish) via news search. Used only to **exclude**
-     stocks, never to add them or feed the recommendation_score: drop a
-     STRONG BUY if its industry score is 5, drop a STRONG SELL if its
-     industry score is 1. Otherwise just mention the industry score in
-     the email as context.
-  - Both of these need genuine web search + LLM judgment, which is why
-    they can't be plain Python in `scheduled_run.py` — they need to run
-    as an actual Claude agent turn.
+- **The weekly research + Gmail draft step is now built**, in a
+  follow-up session. The original open question was local-vs-cloud (see
+  below for that history); the answer landed on **fully local**:
+  - `pipeline/draft_weekly_email.py` is a new final stage of
+    `scheduled_run.py`'s weekly run, isolated in the same try/except
+    pattern as every other stage. It shells out to `claude -p` (scoped
+    with
+    `--allowedTools Read,Glob,WebSearch,mcp__claude_ai_Gmail__create_draft`
+    — not a permissions bypass) with a single self-contained prompt that
+    does the whole research step in one local agent turn: read the
+    latest ratings CSV (path resolved by `_latest_file()`), filter to
+    STRONG BUY/STRONG SELL, find the distinct industry categories
+    actually represented in that shortlist, web-search sentiment (1-5)
+    for just those categories, apply the exclusion rule (drop STRONG BUY
+    if its industry scores 5, drop STRONG SELL if its industry scores
+    1), web-search recent headlines for the survivors, then draft (not
+    send) a Gmail email to kcoopercscs@gmail.com via `create_draft`. No
+    changes to the Windows Scheduled Task were needed — this rides along
+    inside the existing `scheduled_run.py weekly` call.
+  - **A cloud-side split was tried and reverted first**: a separate
+    GitHub Actions workflow (`cloud/score_industry_sentiment.py` +
+    `.github/workflows/weekly-industry-sentiment.yml`) scored all ~30
+    SIC categories unconditionally via the raw Anthropic API + hosted
+    web_search tool, ahead of the local job, so the local step wouldn't
+    need to do that part. It was deleted before ever running for real:
+    it needs a separately-billed `ANTHROPIC_API_KEY` (pay-per-token API
+    credits, distinct from a claude.ai subscription), and the cost of
+    buying those credits wasn't something the user wanted to take on —
+    so this was abandoned in favor of the fully-local version above,
+    which reuses the Claude subscription/CLI login already logged in on
+    this machine at no extra cost. If a cloud-side split is ever
+    revisited, the unexplored alternative is a subscription-backed CI
+    auth token (`claude setup-token` or similar) instead of a metered API
+    key — not investigated, unclear if it works in GitHub Actions or
+    within plan usage limits.
+  - **Not yet verified end-to-end** — `claude -p` with this exact
+    `--allowedTools` flag was smoke-tested (trivial prompt, returned
+    correctly), and all new/edited files were compile-checked and
+    import-checked, but nobody has watched a full real run produce an
+    actual Gmail draft yet. First real Saturday run (or a manual
+    `python scheduled_run.py weekly`) should be checked in
+    `data/logs/` for the `email_draft` stage result, and the Gmail
+    drafts folder checked for the actual output.
 
-- **Open decision on how that step runs** — this is exactly where the
-  conversation was when the handover request came in:
-  - **Option A**: a claude.ai-level MCP Gmail connector (for cloud
-    routines via `/schedule`) — was being set up but the connector
-    wasn't showing up as available to routines, even though a Gmail
-    connector exists and works for *this* (local, cmd-prompt) Claude
-    Code. Those are two different systems: local MCP config (what you
-    have) vs. account-level connector for cloud routines (what
-    `/schedule` needs, currently unconfirmed/not working).
-  - **Option B (leaning towards this one)**: keep it local. Add one more
-    step to the same Windows Scheduled Task, using Claude Code's
-    non-interactive mode (`claude -p "prompt"`) to run the research +
-    Gmail-draft step locally, right after `scheduled_run.py weekly`
-    finishes — reusing the Gmail MCP connection that already
-    demonstrably works in this environment. This was the direction the
-    conversation was heading but never got built.
-  - **Next step**: decide A vs B, then build it. If B, the prompt for
-    `claude -p` needs to be self-contained (no memory of this
-    conversation) — describe: read the latest
-    `data/github_sync/ratings/*.csv` from the repo, filter to STRONG
-    BUY/STRONG SELL, look up each ticker's `industry_category`, search
-    sentiment per represented category, apply the exclusion rule, search
-    headlines per remaining ticker, draft the Gmail email (recipient:
-    kcoopercscs@gmail.com).
-
-- **Quarterly revalidation** (task #34) — not started. The idea: every 3
-  months, rerun `model/backtest.py` and `model/validate_indicators.py`
-  against the by-then-larger local dataset to confirm the indicators
-  (and confluence weights) still hold up, not just accept the original
-  4-year backtest forever. No cadence/automation decided yet.
-
-- **Monthly fundamentals/insider/industry refresh** isn't on a Scheduled
-  Task yet, just documented as a manual command (see above).
+- **Quarterly revalidation** (task #34) is now built — see item 10 above.
+  Not yet verified end-to-end (same caveat as the weekly email draft).
 
 ## Things worth knowing before touching anything
 
@@ -178,8 +205,11 @@ cd Projects/Stocks
 
 python pipeline/check_status.py              # is data current? did the last scheduled run succeed?
 python pipeline/scheduled_run.py weekly       # manually trigger the full weekly flow
+python pipeline/scheduled_run.py monthly      # manually trigger fundamentals/insider/industry refresh
+python pipeline/scheduled_run.py quarterly    # manually trigger backtest + validation + summary email
 python model/rate_universe.py                 # today's cheapest/most expensive (valuation only)
 python model/confluence.py                    # today's full recommendations, best/worst 15
 git log --oneline -10                         # recent history
 gh run list --workflow=weekly-price-fetch.yml # cloud fetch run history
+Get-ScheduledTask -TaskName "StocksPipeline-*" # check all 3 local scheduled tasks (PowerShell)
 ```
