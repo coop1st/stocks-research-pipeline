@@ -37,11 +37,13 @@ it's isolated the same way every other stage is: if this fails (e.g. no
 `claude` on PATH, or a bad response), it doesn't take down the stages
 that already succeeded.
 """
+import re
 import subprocess
 
 import pandas as pd
 
 from config import PROJECT_DIR
+from db import get_connection
 
 RATINGS_DIR = PROJECT_DIR / "data" / "github_sync" / "ratings"
 RECIPIENT = "kcoopercscs@gmail.com"
@@ -57,10 +59,22 @@ SELL_VALUATION_MIN = 4.25
 SELL_MOMENTUM_MIN = 4.25
 SELL_QUALITY_MIN = 3.5
 
+RATING_COLS = ["valuation_rating", "momentum_rating", "quality_rating", "trend_rating"]
 SHORTLIST_COLS = [
-    "symbol", "recommendation", "recommendation_score", "industry_category",
-    "valuation_rating", "momentum_rating", "quality_rating",
+    "symbol", "recommendation", "recommendation_score", "industry_category", *RATING_COLS,
 ]
+
+# Fixed vocabulary per indicator/rating value (1-5), so every ticker's
+# description uses the same words rather than the agent phrasing each one
+# freely -- consistency was specifically asked for. Wording for 1 and 5
+# matches each indicator's own docstring (model/rating.py, momentum.py,
+# quality.py, trend.py); 2-4 are a reasonable linear fill between those.
+RATING_DESCRIPTORS = {
+    "valuation_rating": {1: "extremely cheap", 2: "cheap", 3: "fairly priced", 4: "expensive", 5: "extremely expensive"},
+    "momentum_rating": {1: "strongest momentum", 2: "strong momentum", 3: "moderate momentum", 4: "weak momentum", 5: "weakest momentum"},
+    "quality_rating": {1: "strong improvement", 2: "improving", 3: "stable", 4: "deteriorating", 5: "strong deterioration"},
+    "trend_rating": {1: "strong uptrend", 2: "uptrend", 3: "neutral trend", 4: "downtrend", 5: "strong downtrend"},
+}
 
 
 def _latest_file(directory):
@@ -70,12 +84,50 @@ def _latest_file(directory):
     return files[-1] if files else None
 
 
+_SHARE_CLASS_SUFFIX = re.compile(r"\s*-?\s*(Class\s+[A-Za-z]\s+)?Common Stock\s*$", re.IGNORECASE)
+
+
+def _clean_company_name(name):
+    if pd.isna(name):
+        return name
+    return _SHARE_CLASS_SUFFIX.sub("", name).strip()
+
+
+def _describe(col, value):
+    if pd.isna(value):
+        return "not available"
+    return RATING_DESCRIPTORS[col].get(round(value), "not available")
+
+
+def _enrich(shortlist, as_of_date):
+    symbols = tuple(shortlist["symbol"])
+    if not symbols:
+        return shortlist
+    placeholders = ",".join("?" * len(symbols))
+    with get_connection() as conn:
+        names = pd.read_sql_query(
+            f"SELECT symbol, name AS company_name FROM tickers WHERE symbol IN ({placeholders})",
+            conn, params=symbols,
+        )
+        prices = pd.read_sql_query(
+            f"SELECT symbol, close AS last_close FROM prices WHERE date = ? AND symbol IN ({placeholders})",
+            conn, params=(as_of_date, *symbols),
+        )
+
+    shortlist = shortlist.merge(names, on="symbol", how="left").merge(prices, on="symbol", how="left")
+    shortlist["company_name"] = shortlist["company_name"].apply(_clean_company_name)
+    for col in RATING_COLS:
+        shortlist[f"{col}_desc"] = shortlist[col].apply(lambda v, c=col: _describe(c, v))
+    return shortlist
+
+
 def build_shortlist():
     ratings_path = _latest_file(RATINGS_DIR)
     if ratings_path is None:
         raise RuntimeError(f"No ratings CSV found under {RATINGS_DIR}")
 
     df = pd.read_csv(ratings_path)
+    as_of_date = df["as_of_date"].iloc[0]
     buys = df[
         (df["recommendation"] == "STRONG BUY")
         & (df["valuation_rating"] < BUY_VALUATION_MAX)
@@ -89,7 +141,26 @@ def build_shortlist():
         & (df["quality_rating"] > SELL_QUALITY_MIN)
     ]
     shortlist = pd.concat([buys[SHORTLIST_COLS], sells[SHORTLIST_COLS]], ignore_index=True)
+    shortlist = _enrich(shortlist, as_of_date)
+
+    # Fully pre-formatted per the exact wording/structure requested -- built
+    # here rather than left to the agent's own phrasing, so every ticker
+    # line is consistent rather than each one worded slightly differently.
+    def _line(row):
+        price = f"${row['last_close']:.2f}" if pd.notna(row["last_close"]) else "price not available"
+        return (
+            f"{row['symbol']} ({row['company_name']}) -- last close {price} -- "
+            f"score {row['recommendation_score']:.2f} "
+            f"(valuation: {row['valuation_rating_desc']}, momentum: {row['momentum_rating_desc']}, "
+            f"quality: {row['quality_rating_desc']}, trend: {row['trend_rating_desc']})"
+        )
+
+    if not shortlist.empty:
+        shortlist["display_line"] = shortlist.apply(_line, axis=1)
     return ratings_path, shortlist
+
+
+PROMPT_COLS = ["symbol", "company_name", "industry_category", "recommendation", "display_line"]
 
 
 def build_prompt():
@@ -98,18 +169,20 @@ def build_prompt():
     if shortlist.empty:
         shortlist_block = "(no tickers currently rated STRONG BUY or STRONG SELL)"
     else:
-        shortlist_block = shortlist.to_csv(index=False)
+        shortlist_block = shortlist[PROMPT_COLS].to_csv(index=False)
 
     return f"""You are drafting this week's stock recommendation email. Work
 through these steps and don't stop until a Gmail draft has been created.
 
-This week's shortlist, from {ratings_path.name} (recommendation_score is
-1-5, 1=bullish/5=bearish; same convention for valuation/momentum/quality
-ratings). Already filtered to high-conviction picks: STRONG BUY/STRONG
-SELL by the weighted recommendation_score AND all three of valuation,
-momentum, and quality individually agreeing at their own extreme
-threshold (valuation/momentum <1.75 and quality <2.5 for buys;
-valuation/momentum >4.25 and quality >3.5 for sells):
+This week's shortlist, from {ratings_path.name}. Already filtered to
+high-conviction picks: STRONG BUY/STRONG SELL by the weighted
+recommendation_score AND all three of valuation, momentum, and quality
+individually agreeing at their own extreme threshold (valuation/momentum
+<1.75 and quality <2.5 for buys; valuation/momentum >4.25 and quality
+>3.5 for sells). The display_line column is the exact, ready-to-use line
+for each ticker (already includes company name, last close price, score,
+and a plain-English description of valuation/momentum/quality/trend) --
+use it verbatim, don't reformat or recompute any of it:
 
 {shortlist_block}
 
@@ -128,9 +201,10 @@ Steps:
    - Drop a STRONG SELL ticker if its industry's sentiment score is 1.
    - Otherwise keep it, and note the industry sentiment score/rationale
      as context in the email.
-3. For each ticker remaining after step 2, do a web search for recent
-   (last 1-2 weeks) headlines/news and note anything interesting or
-   relevant to the recommendation -- especially anything that seems to
+3. For each ticker remaining after step 2, do a web search (using its
+   company_name for a more accurate search than the bare ticker) for
+   recent (last 1-2 weeks) headlines/news and note anything interesting
+   or relevant to the recommendation -- especially anything that seems to
    run counter to the model's call.
 4. Draft (do NOT send) a Gmail email to {RECIPIENT} using the
    create_draft tool. Subject: "Weekly stock picks -- <this week's
@@ -140,12 +214,13 @@ Steps:
    flat list -- multiple tickers in the shortlist often share a category,
    and grouping makes any shared industry-sentiment context easy to read
    once instead of repeated per ticker. Under each ticker: its
-   recommendation_score and the three individual ratings that qualified
-   it, plus any notable headline found in step 3. Mention each category's
-   sentiment score/rationale once, at the top of that category's group.
-   Keep it concise and scannable -- this is a personal research email,
-   not a formal report. If the shortlist is empty (either from the start
-   or after exclusions), still draft a short email saying so.
+   display_line verbatim (do not alter the wording, numbers, or order of
+   that line), followed by any notable headline found in step 3 as a
+   short indented note. Mention each category's sentiment score/rationale
+   once, at the top of that category's group. Keep it concise and
+   scannable -- this is a personal research email, not a formal report.
+   If the shortlist is empty (either from the start or after exclusions),
+   still draft a short email saying so.
 
 Use only the tools you've been given (WebSearch and the Gmail
 create_draft tool) -- everything you need besides web search is already
