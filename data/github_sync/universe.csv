@@ -1234,7 +1234,7 @@ CNQ,Canadian Natural Resources Limited Common Stock,NYSE,common_stock,0001017413
 CNR,"Core Natural Resources, Inc. Common Stock",NYSE,common_stock,0001710366
 CNS,Cohen & Steers Inc Common Stock,NYSE,common_stock,0001284812
 CNSP,"CNS Pharmaceuticals, Inc. - Common Stock",NASDAQ,common_stock,0001729427
-CNSY,"Cerenome, Inc. - Common Stock",NASDAQ,common_stock,0001095981
+CNSY,"Cerenome, Inc. - Common Stock",NASDAQ,common_stock,
 CNTB,Connect Biopharma Holdings Limited - Ordinary Shares,NASDAQ,common_stock,0001835268
 CNTN,"Canton Strategic Holdings, Inc. - Common Stock",NASDAQ,common_stock,0001861657
 CNTX,Context Therapeutics Inc. - Common Stock,NASDAQ,common_stock,0001842952
@@ -1883,6 +1883,7 @@ EVTC,"Evertec, Inc. Common Stock",NYSE,common_stock,0001559865
 EVTL,Vertical Aerospace Ltd. Ordinary Shares,NYSE,common_stock,0001867102
 EVV,Eaton Vance Limited Duration Income Fund Common Shares of Beneficial Interest,NYSE American,common_stock,0001222922
 EW,Edwards Lifesciences Corporation Common Stock,NYSE,common_stock,0001099800
+EWAV,East West Ave Acquisition Corp. - Common Stock,NASDAQ,common_stock,0002100704
 EWBC,"East West Bancorp, Inc. - Common Stock",NASDAQ,common_stock,0001069157
 EWTX,"Edgewise Therapeutics, Inc. - Common Stock",NASDAQ,common_stock,0001710072
 EXC,Exelon Corporation - Common Stock,NASDAQ,common_stock,0001109357
@@ -2059,7 +2060,7 @@ FOA,Finance of America Companies Inc. Class A Common Stock,NYSE,common_stock,000
 FOCL,"EDAP TMS S.A. - American Depositary Shares, each representing One Ordinary Share",NASDAQ,common_stock,0001041934
 FOF,"Cohen & Steers Closed-End Opportunity Fund, Inc. Common Stock",NYSE,common_stock,0001375340
 FOFO,"Hang Feng Technology Innovation Co., Ltd. - Ordinary Shares",NASDAQ,common_stock,0002060083
-FOIL,"Londian Wason New Energy Tech Inc. American Depositary Shares, each representing five Ordinary Shares",NYSE,common_stock,0002006960
+FOIL,"Londian Wason New Energy Tech Inc. American Depositary Shares, each representing five Ordinary Shares",NYSE,common_stock,
 FOR,Forestar Group Inc Common Stock,NYSE,common_stock,0001406587
 FORM,"FormFactor, Inc. - Common Stock",NASDAQ,common_stock,0001039399
 FORR,"Forrester Research, Inc. - Common Stock",NASDAQ,common_stock,0001023313
@@ -4060,7 +4061,7 @@ PANL,Pangaea Logistics Solutions Ltd. - Common Stock,NASDAQ,common_stock,0001606
 PANW,"Palo Alto Networks, Inc. - Common Stock",NASDAQ,common_stock,0001327567
 PAPL,Pineapple Financial Inc. Common Stock,NYSE American,common_stock,0001938109
 PAR,PAR Technology Corporation Common Stock,NYSE,common_stock,0000708821
-PARA,"Banzai International, Inc. - Class A Common Stock",NASDAQ,common_stock,0001826011
+PARA,"Banzai International, Inc. - Class A Common Stock",NASDAQ,common_stock,0000813828
 PARK,"Park Dental Partners, Inc. - Common Stock",NASDAQ,common_stock,0002069604
 PARR,"Par Pacific Holdings, Inc.  Common Stock",NYSE,common_stock,0000821483
 PASG,"Passage Bio, Inc. - Common Stock",NASDAQ,common_stock,0001787297
@@ -4409,7 +4410,7 @@ QUCY,Quantum Cyber N.V. - Ordinary Shares,NASDAQ,common_stock,0001874252
 QUIK,QuickLogic Corporation - Common Stock,NASDAQ,common_stock,0000882508
 QUMS,Quantumsphere Acquisition Corp. - Ordinary Shares,NASDAQ,common_stock,0002070900
 QURE,uniQure N.V. - Ordinary Shares,NASDAQ,common_stock,0001590560
-QVCG,"QVC Group, Inc. - Common Stock",NASDAQ,common_stock,0001254699
+QVCG,"QVC Group, Inc. - Common Stock",NASDAQ,common_stock,
 QXL,Quantum X Labs Inc. - Common Stock,NASDAQ,common_stock,0000797542
 QXO,"QXO, Inc. Common Stock",NYSE,common_stock,0001236275
 R,"Ryder System, Inc. Common Stock",NYSE,common_stock,0000085961
@@ -5189,6 +5190,7 @@ TGTX,"TG Therapeutics, Inc. - Common Stock",NASDAQ,common_stock,0001001316
 TH,Target Hospitality Corp. - Common Stock,NASDAQ,common_stock,0001712189
 THC,Tenet Healthcare Corporation Common Stock,NYSE,common_stock,0000070318
 THCH,TH International Limited - Ordinary shares,NASDAQ,common_stock,0001877333
+THEO,BOA Acquisition Corp. II - Class A Ordinary Shares,NASDAQ,common_stock,
 THFF,First Financial Corporation  - Common Stock,NASDAQ,common_stock,0000714562
 THG,Hanover Insurance Group Inc,NYSE,common_stock,0000944695
 THH,TryHard Holdings Limited - Ordinary Shares,NASDAQ,common_stock,0002044241
