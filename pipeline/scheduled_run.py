@@ -30,21 +30,19 @@ completely unattended with nobody watching:
   headline check, and drafting the Gmail email. That's a local step
   (reusing the Claude subscription/CLI login already logged in on this
   machine) rather than a separately-billed cloud API call.
-- The daily run (Monday-Friday) keeps the day-trade shortlist
-  (model/daytrade_live_shortlist.py, see model/README.md's "Fifth
-  attempt") current between weekly full-universe updates: fetches fresh
-  prices for just the liquid subset, recomputes indicators, then drafts
-  a shortlist email the same `claude -p` way as the weekly one -- but
-  skips the (slow) shortlist/email stages entirely if there's no trading
-  data newer than the last successful run, via a small checkpoint file,
-  so a Monday-morning run before the market opens or a market holiday
-  doesn't produce a duplicate or stale email.
+- The weekly run's second-to-last step (train_daytrade_model.py)
+  retrains the day-trade RSI-alone model (see model/README.md's "Fifth
+  attempt") on the full local history and publishes a lookup-table
+  artifact to GitHub. The daily shortlist itself is no longer produced
+  by this local pipeline at all -- it runs as a separate Claude Code
+  cloud routine, Monday-Friday, which reads that artifact plus the
+  published ratings snapshot and needs no local machine on. See
+  docs/superpowers/specs/2026-08-18-daytrade-cloud-automation-design.md.
 
 Usage (what the scheduled tasks actually call):
     python scheduled_run.py weekly
     python scheduled_run.py monthly
     python scheduled_run.py quarterly
-    python scheduled_run.py daily
 """
 import json
 import sys
