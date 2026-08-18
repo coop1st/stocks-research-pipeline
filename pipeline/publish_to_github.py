@@ -23,7 +23,21 @@ def export_latest_ratings():
         latest = conn.execute("SELECT MAX(as_of_date) FROM ratings").fetchone()[0]
         if not latest:
             return None, 0
-        df = pd.read_sql_query("SELECT * FROM ratings WHERE as_of_date = ?", conn, params=(latest,))
+        df = pd.read_sql_query(
+            """
+            SELECT r.*, t.name AS company_name, f.value AS shares_outstanding
+            FROM ratings r
+            LEFT JOIN tickers t ON t.symbol = r.symbol
+            LEFT JOIN (
+                SELECT symbol, value,
+                       ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY filed_date DESC) AS rn
+                FROM fundamentals
+                WHERE metric = 'shares_outstanding' AND filed_date IS NOT NULL AND filed_date != ''
+            ) f ON f.symbol = r.symbol AND f.rn = 1
+            WHERE r.as_of_date = ?
+            """,
+            conn, params=(latest,),
+        )
 
     RATINGS_SYNC_DIR.mkdir(parents=True, exist_ok=True)
     out_path = RATINGS_SYNC_DIR / f"{latest}.csv"
