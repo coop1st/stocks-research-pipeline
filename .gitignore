@@ -10,6 +10,10 @@ data/db/*.log
 # Operational logs from scheduled runs -- local only.
 data/logs/
 
+# Daily-regenerated cache files (e.g. day-trade shortlist snapshots) --
+# rebuilt fresh on every run, never needs to be committed.
+data/cache/
+
 # Python
 __pycache__/
 *.pyc
