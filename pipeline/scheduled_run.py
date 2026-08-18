@@ -30,11 +30,21 @@ completely unattended with nobody watching:
   headline check, and drafting the Gmail email. That's a local step
   (reusing the Claude subscription/CLI login already logged in on this
   machine) rather than a separately-billed cloud API call.
+- The daily run (Monday-Friday) keeps the day-trade shortlist
+  (model/daytrade_live_shortlist.py, see model/README.md's "Fifth
+  attempt") current between weekly full-universe updates: fetches fresh
+  prices for just the liquid subset, recomputes indicators, then drafts
+  a shortlist email the same `claude -p` way as the weekly one -- but
+  skips the (slow) shortlist/email stages entirely if there's no trading
+  data newer than the last successful run, via a small checkpoint file,
+  so a Monday-morning run before the market opens or a market holiday
+  doesn't produce a duplicate or stale email.
 
 Usage (what the scheduled tasks actually call):
     python scheduled_run.py weekly
     python scheduled_run.py monthly
     python scheduled_run.py quarterly
+    python scheduled_run.py daily
 """
 import json
 import sys
@@ -46,6 +56,8 @@ from pathlib import Path
 from config import PROJECT_DIR
 from db import get_connection, get_universe, init_db
 from run_pipeline import (
+    run_benchmark_prices_stage,
+    run_earnings_events_stage,
     run_fundamentals_stage,
     run_industry_stage,
     run_insider_transactions_stage,
@@ -66,6 +78,7 @@ from quarterly_validation import (
 
 sys.path.insert(0, str(PROJECT_DIR / "model"))
 from compute_all_ratings import compute_and_store as compute_all_ratings  # noqa: E402
+from train_daytrade_model import run_train_daytrade_model_stage  # noqa: E402
 
 LOG_DIR = PROJECT_DIR / "data" / "logs"
 STATUS_PATH = LOG_DIR / "last_run_status.json"
@@ -145,10 +158,12 @@ def run_weekly():
         results.append(run_stage_safely("prices", run_prices_stage, [t["symbol"] for t in tickers]))
     else:
         results.append({"stage": "prices", "status": "failed", "elapsed_s": 0, "error": "no tickers in universe"})
+    results.append(run_stage_safely("benchmark_prices", run_benchmark_prices_stage))
     results.append(run_stage_safely("moving_averages", run_moving_averages_stage))
     results.append(run_stage_safely("price_indicators", run_price_indicators_stage))
     results.append(run_stage_safely("ratings", compute_all_ratings))
     results.append(run_stage_safely("publish_ratings", publish_ratings))
+    results.append(run_stage_safely("train_daytrade_model", run_train_daytrade_model_stage))
     results.append(run_stage_safely("email_draft", run_email_draft_stage))
     return results
 
@@ -162,6 +177,7 @@ def run_monthly():
         run_stage_safely("fundamentals", run_fundamentals_stage, pairs),
         run_stage_safely("insider_transactions", run_insider_transactions_stage, tickers),
         run_stage_safely("industry", run_industry_stage, tickers),
+        run_stage_safely("earnings_events", run_earnings_events_stage, tickers),
     ]
 
 
