@@ -40,6 +40,15 @@ Self-contained (no imports from the rest of this repo), matching
 cloud/daytrade_shortlist.py's convention -- must run correctly in an
 ephemeral cloud sandbox that only has this repo cloned.
 
+Also rewrites data/cache/daytrade_shortlist_today.csv in place, appending
+a "Frequency: NN%" note to each of today's stocks' display_line -- how
+often that stock has been suggested over the same rolling window
+count_last_30_days uses (count_last_30_days / number of date columns in
+that window, e.g. 3 suggestions out of the 4 days the ledger has so far
+is "Frequency: 75%"). This runs before the email-drafting steps read that
+file, so the frequency note rides along in display_line without the
+email prompt needing separate wiring.
+
 Run from the repo root, after cloud/daytrade_shortlist.py has produced
 today's shortlist: `python cloud/update_stock_ledger.py`
 """
@@ -81,14 +90,26 @@ def load_shortlist():
         sys.exit(1)
     with open(SHORTLIST_PATH, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        return list(reader)
+        return list(reader), reader.fieldnames
+
+
+def write_shortlist_with_frequency(shortlist_rows, fieldnames, ledger, window_cols):
+    for row in shortlist_rows:
+        ledger_row = ledger[row["symbol"]]
+        count = sum(1 for c in window_cols if ledger_row.get(c))
+        pct = round(100 * count / len(window_cols))
+        row["display_line"] = f"{row['display_line']} -- Frequency: {pct}% ({count} of last {len(window_cols)} days)"
+    with open(SHORTLIST_PATH, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(shortlist_rows)
 
 
 def main():
     today = date.today()
     today_str = today.isoformat()
 
-    shortlist_rows = load_shortlist()
+    shortlist_rows, shortlist_fieldnames = load_shortlist()
     ledger = load_ledger()
 
     date_cols = _date_range(LEDGER_START_DATE, today)
@@ -115,6 +136,9 @@ def main():
         for c in date_cols:
             row.setdefault(c, "")
         row["count_last_30_days"] = sum(1 for c in window_cols if row.get(c))
+
+    if shortlist_rows:
+        write_shortlist_with_frequency(shortlist_rows, shortlist_fieldnames, ledger, window_cols)
 
     os.makedirs(os.path.dirname(LEDGER_PATH), exist_ok=True)
     header = FIXED_COLS + date_cols
