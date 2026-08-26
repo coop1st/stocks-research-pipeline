@@ -2,106 +2,111 @@ symbol,company_name,current_price,count_last_30_days,2026-08-21,2026-08-22,2026-
 AGO,Assured Guaranty Ltd.,75.14,3,74.28,,,,74.19,75.14
 AIG,"American International Group, Inc. New",75.75,1,75.75,,,,,
 AIOT,"PowerFleet, Inc.",2.94,1,,,,,,2.94
-ALGN,"Align Technology, Inc.",159.61,2,,,,,159.64,159.61
+ALGN,"Align Technology, Inc.",160.38999938964844,2,,,,,159.64,160.38999938964844
 ALLY,Ally Financial Inc.,42.45,1,,,,,42.45,
-AMSF,"AMERISAFE, Inc.",26.18,3,25.70,,,,26.42,26.18
+AMSF,"AMERISAFE, Inc.",26.415000915527344,3,25.70,,,,26.42,26.415000915527344
 APEI,"American Public Education, Inc.",44.38,1,44.38,,,,,
-APTV,Aptiv PLC Ordinary Shares,46.63,3,47.03,,,,47.34,46.63
-ARKO,ARKO Corp.,4.67,3,4.59,,,,4.72,4.67
-ASO,"Academy Sports and Outdoors, Inc.",43.47,1,,,,,,43.47
+APTV,Aptiv PLC Ordinary Shares,46.369998931884766,3,47.03,,,,47.34,46.369998931884766
+ARKO,ARKO Corp.,4.695000171661377,3,4.59,,,,4.72,4.695000171661377
+ASO,"Academy Sports and Outdoors, Inc.",43.880001068115234,1,,,,,,43.880001068115234
 ATO,Atmos Energy Corporation,167.56,2,,,,,167.82,167.56
-AZZ,AZZ Inc.,138.51,1,,,,,,138.51
+AZZ,AZZ Inc.,139.21499633789062,1,,,,,,139.21499633789062
 BANC,"Banc of California, Inc.",18.65,1,18.65,,,,,
-BHE,"Benchmark Electronics, Inc.",71.86,2,,,,,71.72,71.86
-BHF,"Brighthouse Financial, Inc.",51.87,3,53.22,,,,51.90,51.87
-BLBD,Blue Bird Corporation,58.65,3,61.33,,,,58.95,58.65
+BHE,"Benchmark Electronics, Inc.",72.70999908447266,2,,,,,71.72,72.70999908447266
+BHF,"Brighthouse Financial, Inc.",52.38999938964844,3,53.22,,,,51.90,52.38999938964844
+BLBD,Blue Bird Corporation,60.36000061035156,3,61.33,,,,58.95,60.36000061035156
 BPOP,"Popular, Inc.",168.43,2,168.22,,,,168.43,
-BV,"BrightView Holdings, Inc.",11.15,3,11.15,,,,10.94,11.15
-BXMT,"Blackstone Mortgage Trust, Inc.",14.03,3,14.35,,,,14.12,14.03
-BYD,Boyd Gaming Corporation,81.11,1,,,,,,81.11
+BV,"BrightView Holdings, Inc.",11.000100135803223,3,11.15,,,,10.94,11.000100135803223
+BXMT,"Blackstone Mortgage Trust, Inc.",13.897000312805176,3,14.35,,,,14.12,13.897000312805176
+BYD,Boyd Gaming Corporation,80.9749984741211,1,,,,,,80.9749984741211
 CFG,"Citizens Financial Group, Inc.",69.71,1,69.71,,,,,
 CHCT,Community Healthcare Trust Incorporated,14.87,1,14.87,,,,,
-CMPR,Cimpress plc - Ordinary Shares,87.88,3,88.86,,,,87.52,87.88
+CMPR,Cimpress plc - Ordinary Shares,87.09500122070312,3,88.86,,,,87.52,87.09500122070312
 COLL,"Collegium Pharmaceutical, Inc.",27.47,3,27.54,,,,27.35,27.47
-CPRI,Capri Holdings Limited Ordinary Shares,13.30,3,13.77,,,,13.68,13.30
-CRUS,"Cirrus Logic, Inc.",111.43,3,116.90,,,,111.64,111.43
+CPRI,Capri Holdings Limited Ordinary Shares,13.6850004196167,3,13.77,,,,13.68,13.6850004196167
+CRUS,"Cirrus Logic, Inc.",111.0999984741211,3,116.90,,,,111.64,111.0999984741211
 CSQR,"Csquare, Inc.",19.60,1,,,,,19.60,
-CTRI,"Centuri Holdings, Inc.",20.79,3,21.78,,,,20.79,20.79
+CTRI,"Centuri Holdings, Inc.",21.280000686645508,3,21.78,,,,20.79,21.280000686645508
 CVS,CVS Health Corporation,94.11,1,,,,,94.11,
-D,"Dominion Energy, Inc.",66.93,2,67.47,,,,,66.93
-DBD,Diebold Nixdorf Incorporated,67.79,2,67.81,,,,,67.79
-DECK,Deckers Outdoor Corporation,88.86,1,88.86,,,,,
-DVA,DaVita Inc.,177.80,3,175.24,,,,176.50,177.80
-ECVT,Ecovyst Inc.,10.13,3,10.32,,,,10.07,10.13
-EMA,Emera Incorporated Common Shares,50.47,2,,,,,50.39,50.47
-ENB,Enbridge Inc,49.74,2,50.99,,,,,49.74
+D,"Dominion Energy, Inc.",66.81500244140625,2,67.47,,,,,66.81500244140625
+DBD,Diebold Nixdorf Incorporated,68.2750015258789,2,67.81,,,,,68.2750015258789
+DECK,Deckers Outdoor Corporation,89.3219985961914,2,88.86,,,,,89.3219985961914
+DVA,DaVita Inc.,181.22000122070312,3,175.24,,,,176.50,181.22000122070312
+ECVT,Ecovyst Inc.,10.135000228881836,3,10.32,,,,10.07,10.135000228881836
+EMA,Emera Incorporated Common Shares,50.61000061035156,2,,,,,50.39,50.61000061035156
+ENB,Enbridge Inc,50.31999969482422,2,50.99,,,,,50.31999969482422
 FBK,FB Financial Corporation,57.28,1,,,,,,57.28
-FHB,"First Hawaiian, Inc.",25.78,3,26.61,,,,26.04,25.78
-FITB,Fifth Third Bancorp,54.89,3,54.50,,,,54.90,54.89
-FNF,"Fidelity National Financial, Inc.",47.38,3,47.44,,,,47.43,47.38
+FHB,"First Hawaiian, Inc.",25.950000762939453,3,26.61,,,,26.04,25.950000762939453
+FITB,Fifth Third Bancorp,55.119998931884766,3,54.50,,,,54.90,55.119998931884766
+FNF,"Fidelity National Financial, Inc.",47.48500061035156,3,47.44,,,,47.43,47.48500061035156
 FRME,First Merchants Corporation,41.56,1,,,,,,41.56
 FSBC,Five Star Bancorp,44.90,2,45.04,,,,,44.90
-FSLR,"First Solar, Inc.",206.82,2,,,,,208.31,206.82
-FTS,Fortis Inc. Common Shares,55.07,1,,,,,,55.07
-GILT,Gilat Satellite Networks Ltd. - Ordinary Shares,10.12,2,,,,,9.95,10.12
+FSLR,"First Solar, Inc.",205.8300018310547,2,,,,,208.31,205.8300018310547
+FTS,Fortis Inc. Common Shares,55.15999984741211,1,,,,,,55.15999984741211
+GILT,Gilat Satellite Networks Ltd. - Ordinary Shares,10.15999984741211,2,,,,,9.95,10.15999984741211
 GL,Globe Life Inc.,172.24,1,,,,,,172.24
-GME,GameStop Corporation,18.09,3,18.04,,,,18.04,18.09
-GTX,Garrett Motion Inc.,26.27,3,26.40,,,,25.84,26.27
+GME,GameStop Corporation,17.91010093688965,3,18.04,,,,18.04,17.91010093688965
+GTX,Garrett Motion Inc.,26.905000686645508,3,26.40,,,,25.84,26.905000686645508
 GXO,"GXO Logistics, Inc.",45.37,1,45.37,,,,,
 HBAN,Huntington Bancshares Incorporated,16.95,3,17.01,,,,17.04,16.95
 HDB,HDFC Bank Limited,23.34,1,23.34,,,,,
 HII,"Huntington Ingalls Industries, Inc.",291.15,2,,,,,294.63,291.15
-HON,Honeywell International Inc.,215.68,2,,,,,214.77,215.68
-HTB,"HomeTrust Bancshares, Inc.",46.61,3,46.71,,,,46.95,46.61
-IPGP,IPG Photonics Corporation,71.73,3,74.43,,,,70.74,71.73
-IVT,InvenTrust Properties Corp.,32.68,2,,,,,32.82,32.68
+HON,Honeywell International Inc.,219.86000061035156,2,,,,,214.77,219.86000061035156
+HTB,"HomeTrust Bancshares, Inc.",46.650001525878906,3,46.71,,,,46.95,46.650001525878906
+IPGP,IPG Photonics Corporation,74.70500183105469,3,74.43,,,,70.74,74.70500183105469
+IVT,InvenTrust Properties Corp.,32.689998626708984,2,,,,,32.82,32.689998626708984
+JKS,JinkoSolar Holding Company Limited American Depositary Shares (each representing 4 Common Shares),13.630000114440918,1,,,,,,13.630000114440918
 KLRA,"Kailera Therapeutics, Inc.",16.54,1,,,,,16.54,
-KRG,Kite Realty Group Trust,26.44,3,26.27,,,,26.26,26.44
-LFTO,"Liftoff Mobile, Inc.",18.36,1,18.36,,,,,
-LHX,"L3Harris Technologies, Inc.",262.17,2,,,,,262.83,262.17
-LMB,"Limbach Holdings, Inc.",41.91,3,42.75,,,,41.71,41.91
-LYTS,LSI Industries Inc.,20.65,3,20.62,,,,19.59,20.65
+KRG,Kite Realty Group Trust,26.34000015258789,3,26.27,,,,26.26,26.34000015258789
+LFTO,"Liftoff Mobile, Inc.",18.375,2,18.36,,,,,18.375
+LHX,"L3Harris Technologies, Inc.",262.6000061035156,2,,,,,262.83,262.6000061035156
+LMB,"Limbach Holdings, Inc.",41.64500045776367,3,42.75,,,,41.71,41.64500045776367
+LYTS,LSI Industries Inc.,20.325000762939453,3,20.62,,,,19.59,20.325000762939453
 MGM,MGM Resorts International,43.34,1,,,,,,43.34
-MKL,Markel Group Inc.,1808.90,3,1788.29,,,,1817.30,1808.90
+MGRC,McGrath RentCorp,114.625,1,,,,,,114.625
+MKL,Markel Group Inc.,1809.6949462890625,3,1788.29,,,,1817.30,1809.6949462890625
 MLI,"Mueller Industries, Inc.",61.51,1,,,,,,61.51
 NBHC,National Bank Holdings Corporation,41.29,1,,,,,,41.29
-NI,NiSource Inc,40.65,3,41.64,,,,40.83,40.65
+NI,NiSource Inc,41.005001068115234,3,41.64,,,,40.83,41.005001068115234
 NRG,"NRG Energy, Inc.",113.61,3,115.36,,,,111.78,113.61
+NTB,Bank of N.T. Butterfield & Son Limited (The) Voting Ordinary Shares,58.38999938964844,1,,,,,,58.38999938964844
 NTES,"NetEase, Inc. - American Depositary Shares",119.81,1,119.81,,,,,
 OGE,OGE Energy Corp,45.94,1,,,,,,45.94
-OMCL,"Omnicell, Inc.",33.22,3,35.50,,,,34.66,33.22
-OPLN,"OPENLANE, Inc.",34.05,2,34.19,,,,34.05,
-ORN,"Orion Group Holdings, Inc. Common",9.33,3,9.18,,,,9.10,9.33
+OMCL,"Omnicell, Inc.",33.6150016784668,3,35.50,,,,34.66,33.6150016784668
+OPLN,"OPENLANE, Inc.",34.42499923706055,3,34.19,,,,34.05,34.42499923706055
+ORN,"Orion Group Holdings, Inc. Common",9.289999961853027,3,9.18,,,,9.10,9.289999961853027
 PEG,Public Service Enterprise Group Incorporated,73.28,3,74.62,,,,73.53,73.28
+PHIN,PHINIA Inc.,69.4749984741211,1,,,,,,69.4749984741211
 PRI,"Primerica, Inc.",297.86,1,297.86,,,,,
 PRIM,Primoris Services Corporation,74.80,1,,,,,,74.80
-QFIN,"Qfin Holdings, Inc. - American Depositary Shares",11.53,3,11.45,,,,10.99,11.53
+QFIN,"Qfin Holdings, Inc.  - American Depositary Shares",9.34000015258789,3,11.45,,,,10.99,9.34000015258789
 R,"Ryder System, Inc.",246.18,3,247.85,,,,244.93,246.18
-RNST,Renasant Corporation,41.01,2,,,,,41.42,41.01
-RRX,Regal Rexnord Corporation,162.18,3,165.85,,,,162.72,162.18
-SARO,"StandardAero, Inc.",24.96,3,25.23,,,,24.57,24.96
-SEB,Seaboard Corporation,4136.00,1,,,,,,4136.00
+RNST,Renasant Corporation,41.08000183105469,2,,,,,41.42,41.08000183105469
+RRX,Regal Rexnord Corporation,165.0749969482422,3,165.85,,,,162.72,165.0749969482422
+SARO,"StandardAero, Inc.",25.170000076293945,3,25.23,,,,24.57,25.170000076293945
+SEB,Seaboard Corporation,4035.429931640625,1,,,,,,4035.429931640625
 SEDG,"SolarEdge Technologies, Inc.",29.88,2,,,,,30.09,29.88
-SFD,"Smithfield Foods, Inc.",22.25,3,22.28,,,,22.31,22.25
+SFD,"Smithfield Foods, Inc.",22.06999969482422,3,22.28,,,,22.31,22.06999969482422
 SIG,Signet Jewelers Limited Common Shares,81.02,1,81.02,,,,,
 SSYS,"Stratasys, Ltd.",7.65,1,,,,,7.65,
-SWBI,"Smith & Wesson Brands, Inc.",13.51,2,,,,,13.65,13.51
-TCBK,TriCo Bancshares,53.88,2,,,,,54.52,53.88
-TCMD,"Tactile Systems Technology, Inc.",23.58,2,23.43,,,,,23.58
-TDAY,"USA TODAY Co., Inc.",6.49,3,6.52,,,,6.41,6.49
-TDOC,"Teladoc Health, Inc.",6.19,1,,,,,,6.19
-TRIP,"TripAdvisor, Inc.",10.10,3,10.03,,,,10.19,10.10
-TRP,TC Energy Corporation,61.85,2,,,,,62.06,61.85
-TRTX,"TPG RE Finance Trust, Inc.",7.80,1,,,,,,7.80
-TXT,Textron Inc.,81.80,2,,,,,82.13,81.80
+SWBI,"Smith & Wesson Brands, Inc.",13.479999542236328,2,,,,,13.65,13.479999542236328
+TCBK,TriCo Bancshares,54.09000015258789,2,,,,,54.52,54.09000015258789
+TCMD,"Tactile Systems Technology, Inc.",23.3799991607666,2,23.43,,,,,23.3799991607666
+TDAY,"USA TODAY Co., Inc.",6.465000152587891,3,6.52,,,,6.41,6.465000152587891
+TDOC,"Teladoc Health, Inc.",6.335000038146973,1,,,,,,6.335000038146973
+TRIP,"TripAdvisor, Inc.",10.010000228881836,3,10.03,,,,10.19,10.010000228881836
+TRP,TC Energy Corporation,62.834999084472656,2,,,,,62.06,62.834999084472656
+TRTX,"TPG RE Finance Trust, Inc.",7.755000114440918,1,,,,,,7.755000114440918
+TXT,Textron Inc.,83.12999725341797,2,,,,,82.13,83.12999725341797
 UAL,"United Airlines Holdings, Inc.",113.57,2,111.71,,,,113.57,
 USB,U.S. Bancorp,61.78,1,61.78,,,,,
-UTI,Universal Technical Institute Inc,22.51,3,22.92,,,,22.02,22.51
-VFC,V.F. Corporation,13.85,2,13.95,,,,,13.85
-WB,Weibo Corporation - American Depositary Shares,7.12,3,7.19,,,,7.00,7.12
-WLFC,Willis Lease Finance Corporation,54.62,3,54.18,,,,55.15,54.62
+UTI,Universal Technical Institute Inc,22.170000076293945,3,22.92,,,,22.02,22.170000076293945
+VFC,V.F. Corporation,13.895000457763672,2,13.95,,,,,13.895000457763672
+WB,Weibo Corporation - American Depositary Shares,7.034999847412109,3,7.19,,,,7.00,7.034999847412109
+WLFC,Willis Lease Finance Corporation,55.31999969482422,3,54.18,,,,55.15,55.31999969482422
 WMK,"Weis Markets, Inc.",70.18,1,70.18,,,,,
-WRB,W.R. Berkley Corporation,68.48,2,69.18,,,,,68.48
-WTFC,Wintrust Financial Corporation,151.09,3,152.61,,,,151.99,151.09
+WRB,W.R. Berkley Corporation,68.77999877929688,2,69.18,,,,,68.77999877929688
+WTFC,Wintrust Financial Corporation,153.5800018310547,3,152.61,,,,151.99,153.5800018310547
 XYL,Xylem Inc. Common Stock New,112.81,1,,,,,,112.81
-YSS,York Space Systems Inc.,9.32,3,9.20,,,,9.76,9.32
+YSS,York Space Systems Inc.,9.170000076293945,3,9.20,,,,9.76,9.170000076293945
+ZTO,"ZTO Express (Cayman) Inc. American Depositary Shares, each representing one Class A ordinary share.",21.309999465942383,1,,,,,,21.309999465942383
