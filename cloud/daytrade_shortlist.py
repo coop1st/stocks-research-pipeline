@@ -212,7 +212,7 @@ def main():
     shortlist = build_shortlist(today_df, ratings_df, model)
 
     os.makedirs("data/cache", exist_ok=True)
-    out_cols = ["symbol", "company_name", "cap_bucket", "industry_category", "display_line"]
+    out_cols = ["symbol", "company_name", "cap_bucket", "industry_category", "last_close", "display_line"]
     if shortlist.empty:
         pd.DataFrame(columns=out_cols).to_csv(OUT_PATH, index=False)
     else:
