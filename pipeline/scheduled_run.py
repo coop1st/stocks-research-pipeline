@@ -66,6 +66,7 @@ from run_pipeline import (
 )
 
 from draft_weekly_email import run_email_draft_stage
+from publish_rating_shortlist import run_publish_rating_shortlist_stage
 from publish_to_github import publish as publish_ratings
 from pull_github_updates import pull_and_merge
 from quarterly_validation import (
@@ -162,6 +163,7 @@ def run_weekly():
     results.append(run_stage_safely("ratings", compute_all_ratings))
     results.append(run_stage_safely("publish_ratings", publish_ratings))
     results.append(run_stage_safely("train_daytrade_model", run_train_daytrade_model_stage))
+    results.append(run_stage_safely("publish_rating_shortlist", run_publish_rating_shortlist_stage))
     results.append(run_stage_safely("email_draft", run_email_draft_stage))
     return results
 
