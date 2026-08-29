@@ -1,42 +1,50 @@
-symbol,company_name,2026-08-21
-ADAM,"Adamas Trust, Inc.",STRONG BUY/9.94
-ALZN,"Alzamend Neuro, Inc.",STRONG SELL/1.56
-AMCX,AMC Global Media Inc.,STRONG BUY/12.39
-AMOD,"Alpha Modus Holdings, Inc.",STRONG SELL/4.63
-AMST,Amesite Inc.,STRONG SELL/1.07
-ATHR,"Aether Holdings, Inc.",STRONG SELL/3.65
-AVAV,"AeroVironment, Inc.",STRONG SELL/160.22
-BCAB,"BioAtla, Inc.",STRONG SELL/3.18
-BIRD,"Smartbird, Inc.",STRONG SELL/2.45
-CRWD,"CrowdStrike Holdings, Inc.",STRONG BUY/191.95
-DDOG,"Datadog, Inc.",STRONG BUY/235.62
-DJT,Trump Media & Technology Group Corp.,STRONG SELL/9.10
-EVEX,"Eve Holding, Inc.",STRONG SELL/2.63
-FIGS,"FIGS, Inc.",STRONG BUY/14.68
-FISI,"Financial Institutions, Inc.",STRONG BUY/41.20
-HDRN,"Hadron Energy, Inc.",STRONG SELL/1.87
-HIND,"Vyome Holdings, Inc.",STRONG SELL/2.25
-INDP,"Indaptus Therapeutics, Inc.",STRONG SELL/1.29
-INO,"Inovio Pharmaceuticals, Inc.",STRONG SELL/1.18
-JOBY,"Joby Aviation, Inc.",STRONG SELL/7.53
-JRSH,"Jerash Holdings (US), Inc.",STRONG BUY/5.49
-KDK,"Kodiak AI, Inc.",STRONG SELL/3.94
-LCTX,"Lineage Cell Therapeutics, Inc.",STRONG SELL/1.08
-LVWR,"LiveWire Group, Inc.",STRONG SELL/1.20
-MIST,Milestone Pharmaceuticals Inc. - Common Shares,STRONG SELL/1.05
-NBR,Nabors Industries Ltd.,STRONG BUY/92.41
-NTHI,"NeOnc Technologies Holdings, Inc.",STRONG SELL/4.68
-OPHC,"OptimumBank Holdings, Inc.",STRONG BUY/9.30
-OPY,"Oppenheimer Holdings, Inc. Class A Common Stock (DE)",STRONG BUY/115.99
-PARR,"Par Pacific Holdings, Inc.",STRONG BUY/79.03
-PLUR,Pluri Inc.,STRONG SELL/1.71
-PLYX,"Polaryx Therapeutics, Inc.",STRONG SELL/2.07
-PMI,"Picard Medical, Inc.",STRONG SELL/3.21
-QNRX,"Quoin Pharmaceuticals, Ltd. - American Depositary Shares",STRONG SELL/5.57
-SCHL,Scholastic Corporation,STRONG BUY/40.14
-SMMT,Summit Therapeutics Inc.,STRONG SELL/13.16
-SPRY,"ARS Pharmaceuticals, Inc.",STRONG SELL/5.51
-VIRT,"Virtu Financial, Inc.",STRONG BUY/67.93
-WLY,"John Wiley & Sons, Inc.",STRONG BUY/51.58
-WLYB,"John Wiley & Sons, Inc.",STRONG BUY/52.24
-XCUR,"Exicure, Inc.",STRONG SELL/1.15
+symbol,company_name,2026-08-21,2026-08-28
+ADAM,"Adamas Trust, Inc.",STRONG BUY/9.94,STRONG BUY/9.80
+AGIG,Abundia Global Impact Group Inc.,,STRONG SELL/1.01
+ALZN,"Alzamend Neuro, Inc.",STRONG SELL/1.56,
+AMCI,AMC Robotics Corporation,,STRONG SELL/3.88
+AMCX,AMC Global Media Inc.,STRONG BUY/12.39,STRONG BUY/12.66
+AMOD,"Alpha Modus Holdings, Inc.",STRONG SELL/4.63,STRONG SELL/2.50
+AMST,Amesite Inc.,STRONG SELL/1.07,STRONG SELL/1.06
+ATHR,"Aether Holdings, Inc.",STRONG SELL/3.65,STRONG SELL/2.88
+AVAV,"AeroVironment, Inc.",STRONG SELL/160.22,STRONG SELL/147.94
+BCAB,"BioAtla, Inc.",STRONG SELL/3.18,STRONG SELL/1.74
+BDL,"Flanigan's Enterprises, Inc.",,STRONG BUY/45.50
+BIRD,"Smartbird, Inc.",STRONG SELL/2.45,STRONG SELL/2.54
+CRWD,"CrowdStrike Holdings, Inc.",STRONG BUY/191.95,STRONG BUY/218.40
+CZFS,"Citizens Financial Services, Inc.",,STRONG BUY/80.98
+DDOG,"Datadog, Inc.",STRONG BUY/235.62,STRONG BUY/236.98
+DJT,Trump Media & Technology Group Corp.,STRONG SELL/9.10,
+EVEX,"Eve Holding, Inc.",STRONG SELL/2.63,STRONG SELL/2.31
+FIGS,"FIGS, Inc.",STRONG BUY/14.68,
+FISI,"Financial Institutions, Inc.",STRONG BUY/41.20,STRONG BUY/40.96
+HDRN,"Hadron Energy, Inc.",STRONG SELL/1.87,STRONG SELL/1.97
+HIND,"Vyome Holdings, Inc.",STRONG SELL/2.25,STRONG SELL/2.20
+INDP,"Indaptus Therapeutics, Inc.",STRONG SELL/1.29,STRONG SELL/1.14
+INO,"Inovio Pharmaceuticals, Inc.",STRONG SELL/1.18,STRONG SELL/1.29
+JOBY,"Joby Aviation, Inc.",STRONG SELL/7.53,STRONG SELL/6.98
+JRSH,"Jerash Holdings (US), Inc.",STRONG BUY/5.49,STRONG BUY/5.42
+KDK,"Kodiak AI, Inc.",STRONG SELL/3.94,STRONG SELL/3.90
+KRMN,Karman Holdings Inc.,,STRONG SELL/45.57
+LCTX,"Lineage Cell Therapeutics, Inc.",STRONG SELL/1.08,
+LVWR,"LiveWire Group, Inc.",STRONG SELL/1.20,STRONG SELL/1.35
+MIST,Milestone Pharmaceuticals Inc. - Common Shares,STRONG SELL/1.05,STRONG SELL/1.16
+NBR,Nabors Industries Ltd.,STRONG BUY/92.41,STRONG BUY/91.71
+NMRA,"Neumora Therapeutics, Inc.",,STRONG SELL/1.39
+NTHI,"NeOnc Technologies Holdings, Inc.",STRONG SELL/4.68,STRONG SELL/4.69
+NTRP,"NextTrip, Inc.",,STRONG SELL/1.57
+OPHC,"OptimumBank Holdings, Inc.",STRONG BUY/9.30,STRONG BUY/8.98
+OPY,"Oppenheimer Holdings, Inc. Class A Common Stock (DE)",STRONG BUY/115.99,STRONG BUY/119.01
+PARR,"Par Pacific Holdings, Inc.",STRONG BUY/79.03,STRONG BUY/78.85
+PLUR,Pluri Inc.,STRONG SELL/1.71,STRONG SELL/1.53
+PLYX,"Polaryx Therapeutics, Inc.",STRONG SELL/2.07,STRONG SELL/2.06
+PMI,"Picard Medical, Inc.",STRONG SELL/3.21,STRONG SELL/8.80
+QNRX,"Quoin Pharmaceuticals, Ltd. - American Depositary Shares",STRONG SELL/5.57,
+SCHL,Scholastic Corporation,STRONG BUY/40.14,
+SMMT,Summit Therapeutics Inc.,STRONG SELL/13.16,STRONG SELL/13.73
+SPRY,"ARS Pharmaceuticals, Inc.",STRONG SELL/5.51,STRONG SELL/5.89
+TCRT,"Alaunos Therapeutics, Inc.",,STRONG SELL/1.61
+VIRT,"Virtu Financial, Inc.",STRONG BUY/67.93,STRONG BUY/66.39
+WLY,"John Wiley & Sons, Inc.",STRONG BUY/51.58,STRONG BUY/53.71
+WLYB,"John Wiley & Sons, Inc.",STRONG BUY/52.24,
+XCUR,"Exicure, Inc.",STRONG SELL/1.15,STRONG SELL/1.29
