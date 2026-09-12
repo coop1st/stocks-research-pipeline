@@ -247,7 +247,7 @@ ALNT,Allient Inc. - Common Stock,NASDAQ,common_stock,0000046129
 ALNY,"Alnylam Pharmaceuticals, Inc. - Common Stock",NASDAQ,common_stock,0001178670
 ALOV,"Aldabra 4 Liquidity Opportunity Vehicle, Inc. - Class A Ordinary Shares",NASDAQ,common_stock,0002083989
 ALOY,REalloys Inc. - Common Stock,NASDAQ,common_stock,0001567900
-ALP,Alpha Compute Corp  - Common Stock,NASDAQ,common_stock,0001095435
+ALP,Alpha Compute Corp  - Ordinary Shares,NASDAQ,common_stock,0001095435
 ALPS,ALPS Group Inc - Ordinary Share,NASDAQ,common_stock,0002025774
 ALPX,Alpex Acquisition Corporation - Class A Ordinary Shares,NASDAQ,common_stock,0002125551
 ALRM,"Alarm.com Holdings, Inc. - Common Stock",NASDAQ,common_stock,0001459200
@@ -264,6 +264,7 @@ ALX,"Alexander's, Inc. Common Stock",NYSE,common_stock,0000003499
 ALXO,ALX Oncology Holdings Inc. - Common Stock,NASDAQ,common_stock,0001810182
 ALZN,"Alzamend Neuro, Inc. - Common Stock",NASDAQ,common_stock,0001677077
 AM,Antero Midstream Corporation Common Stock,NYSE,common_stock,0001623925
+AMAC,AMR Resources Acquisition Corp - Class A Ordinary Shares,NASDAQ,common_stock,0002110119
 AMAL,Amalgamated Financial Corp. - Common Stock,NASDAQ,common_stock,0001823608
 AMAN,Amanat Acquisition Corp - Class A Ordinary Shares,NASDAQ,common_stock,0002112457
 AMAT,"Applied Materials, Inc. - Common Stock",NASDAQ,common_stock,0000006951
@@ -424,7 +425,7 @@ AS,"Amer Sports, Inc. Ordinary Shares",NYSE,common_stock,0001988894
 ASA,ASA  Gold and Precious Metals Limited,NYSE,common_stock,0001230869
 ASAN,"Asana, Inc. Class A Common Stock",NYSE,common_stock,0001477720
 ASB,Associated Banc-Corp Common Stock,NYSE,common_stock,0000007789
-ASBP,"Aspire Biopharma Holdings, Inc.  - Common Stock",NASDAQ,common_stock,0001847345
+ASBP,"Aspire-Lakewood Holdings, Inc. - Common Stock",NASDAQ,common_stock,0001847345
 ASC,Ardmore Shipping Corporation Common Stock,NYSE,common_stock,0001577437
 ASG,"Liberty All-Star Growth Fund, Inc.",NYSE,common_stock,0000786035
 ASGI,abrdn Global Infrastructure Income Fund Common Shares of Beneficial Interest,NYSE,common_stock,0001793855
@@ -486,6 +487,7 @@ ATRC,"AtriCure, Inc. - Common Stock",NASDAQ,common_stock,0001323885
 ATRO,Astronics Corporation - Common Stock,NASDAQ,common_stock,0000008063
 ATS,ATS Corporation Common Shares,NYSE,common_stock,0001394832
 ATTO,"Attovia Therapeutics, Inc. - Common Stock",NASDAQ,common_stock,0002058707
+ATTT,Atlas Trinity Tech Limited - Ordinary Shares,NASDAQ,common_stock,0001948443
 ATXG,Addentax Group Corp. - Common Stock,NASDAQ,common_stock,0001650101
 ATYR,"aTyr Pharma, Inc. - Common Stock",NASDAQ,common_stock,0001339970
 AU,AngloGold Ashanti PLC Ordinary Shares,NYSE,common_stock,0001973832
@@ -503,6 +505,7 @@ AURE,Aurelion Inc.  - Class A Ordinary Shares,NASDAQ,common_stock,0001765850
 AUST,Austin Gold Corp. Common Shares,NYSE American,common_stock,0001817740
 AUTL,Autolus Therapeutics plc - American Depositary Shares,NASDAQ,common_stock,0001730463
 AUUD,Auddia Inc. - Common Stock,NASDAQ,common_stock,0001554818
+AUXX,Gold X2 Mining Inc. Common Shares,NYSE American,common_stock,0001961592
 AVA,Avista Corporation Common Stock,NYSE,common_stock,0000104918
 AVAH,Aveanna Healthcare Holdings Inc. - Common Stock,NASDAQ,common_stock,0001832332
 AVAT,Avalanche Treasury Corporation - Class A Common Stock,NASDAQ,common_stock,0002092446
@@ -832,7 +835,6 @@ BRKR,Bruker Corporation - Common Stock,NASDAQ,common_stock,0001109354
 BRLS,Borealis Foods Inc. - Class A Common Shares,NASDAQ,common_stock,0001852973
 BRLT,"Brilliant Earth Group, Inc. - Class A Common Stock",NASDAQ,common_stock,0001866757
 BRN,"Barnwell Industries, Inc. Common Stock",NYSE American,common_stock,0000010048
-BRNS,Barinthus Biotherapeutics plc - American Depositary Shares,NASDAQ,common_stock,0001828185
 BRNX,BrenX Ltd. - Ordinary Shares,NASDAQ,common_stock,0001901215
 BRO,"Brown & Brown, Inc. Common Stock",NYSE,common_stock,0000079282
 BROS,Dutch Bros Inc. Class A Common Stock,NYSE,common_stock,0001866581
@@ -840,6 +842,7 @@ BRR,"ProCap Financial, Inc. - Common Stock",NASDAQ,common_stock,0002076163
 BRSL,"Brightstar Lottery PLC Trading under the Legal Name to begin at the market open on July 21, 2025. Ordinary Shares",NYSE,common_stock,0001619762
 BRSP,"BrightSpire Capital, Inc. Class A Common Stock",NYSE,common_stock,0001717547
 BRT,BRT Apartments Corp. (MD) Common Stock,NYSE,common_stock,0000014846
+BRTM,B&R Technology Merger Corp. - Class A Ordinary Shares,NASDAQ,common_stock,0002131350
 BRTX,"BioRestorative Therapies, Inc. - Common Stock",NASDAQ,common_stock,0001505497
 BRUN,Boost Run Inc. - Class A Common Stock,NASDAQ,common_stock,0002090646
 BRVE,"Braveheart Bio, Inc. - Common Stock",NASDAQ,common_stock,0002131524
@@ -860,7 +863,6 @@ BSTZ,BlackRock Science and Technology Term Trust Common Shares of Beneficial Int
 BSVN,Bank7 Corp. - Common stock,NASDAQ,common_stock,0001746129
 BSX,Boston Scientific Corporation Common Stock,NYSE,common_stock,0000885725
 BSY,"Bentley Systems, Incorporated - Class B Common Stock",NASDAQ,common_stock,0001031308
-BTAI,"BioXcel Therapeutics, Inc. - Common Stock",NASDAQ,common_stock,0001720893
 BTBD,"BT Brands, Inc. - Common Stock",NASDAQ,common_stock,0001718224
 BTBT,"Bit Digital, Inc. - Ordinary Share",NASDAQ,common_stock,0001710350
 BTCS,BTCS Inc. - Common Stock,NASDAQ,common_stock,0001436229
@@ -1432,7 +1434,6 @@ CXM,"Sprinklr, Inc. Class A Common Stock",NYSE,common_stock,0001569345
 CXT,"Crane NXT, Co. Common Stock",NYSE,common_stock,0000025445
 CXW,"CoreCivic, Inc. Common Stock",NYSE,common_stock,0001070985
 CYAB,"Cyabra, Inc. - Common Stock",NASDAQ,common_stock,0002032341
-CYCN,"Cyclerion Therapeutics, Inc. - Common Stock",NASDAQ,common_stock,0001755237
 CYCU,"Cycurion, Inc. - Common Stock",NASDAQ,common_stock,0001868419
 CYD,China Yuchai International Limited Common Stock,NYSE,common_stock,0000932695
 CYH,"Community Health Systems, Inc. Common Stock",NYSE,common_stock,0001108109
@@ -1776,6 +1777,7 @@ ENTX,Entera Bio Ltd. - Ordinary Shares,NASDAQ,common_stock,0001638097
 ENVA,"Enova International, Inc. Common Stock",NYSE,common_stock,0001529864
 ENVB,"Enveric Biosciences, Inc.  - Common Stock",NASDAQ,common_stock,0000890821
 ENVX,Enovix Corporation - Common Stock,NASDAQ,common_stock,0001828318
+EOCN,Eocene Ltd. - Ordinary Shares,NASDAQ,common_stock,0001595353
 EOD,Allspring Global Dividend Opportunity Fund Common Shares of Beneficial Interest,NYSE,common_stock,0001386067
 EOG,"EOG Resources, Inc. Common Stock",NYSE,common_stock,0000821189
 EOI,Eaton Vance Enhance Equity Income Fund Eaton Vance Enhanced Equity Income Fund Shares of Beneficial Interest,NYSE,common_stock,0001300391
@@ -2265,7 +2267,6 @@ GLE,Global Engine Group Holding Limited - Class A Ordinary Shares,NASDAQ,common_
 GLED,GalaxyEdge Acquisition Corporation Ordinary Shares,NYSE,common_stock,0002091484
 GLIBA,Liberty Capital Corporation - Series A GCI Group Common Stock,NASDAQ,common_stock,0002057463
 GLIBK,Liberty Capital Corporation - Series C GCI Group Common Stock,NASDAQ,common_stock,0002057463
-GLMD,Galmed Pharmaceuticals Ltd. - Ordinary Shares,NASDAQ,common_stock,0001595353
 GLND,Greenland Energy Company - Common Stock,NASDAQ,common_stock,0002093507
 GLNG,Golar LNG Limited - Common Shares,NASDAQ,common_stock,0001207179
 GLO,Clough Global Opportunities Fund Common Stock,NYSE American,common_stock,0001350869
@@ -2494,6 +2495,7 @@ HLMN,Hillman Solutions Corp. - Common Stock,NASDAQ,common_stock,0001822492
 HLN,Haleon plc American Depositary Shares (Each representing two Ordinary Shares),NYSE,common_stock,0001900304
 HLNE,Hamilton Lane Incorporated - Class A Common Stock,NASDAQ,common_stock,0001433642
 HLP,Hongli Group Inc. - Class A Ordinary Shares,NASDAQ,common_stock,0001855557
+HLSQ,Tessera Defense and Homeland Security Inc. Common Stock,NYSE American,common_stock,0001739174
 HLT,Hilton Worldwide Holdings Inc. Common Stock,NYSE,common_stock,0001585689
 HLXC,Helix Acquisition Corp. III - Class A Ordinary Shares,NASDAQ,common_stock,0002099656
 HMC,"Honda Motor Company, Ltd. Common Stock",NYSE,common_stock,0000715153
@@ -2516,7 +2518,7 @@ HON,Honeywell International Inc. - Common Stock,NASDAQ,common_stock,0000773840
 HONA,Honeywell Aerospace Inc. - Common Stock,NASDAQ,common_stock,0002089271
 HOOD,"Robinhood Markets, Inc. - Class A Common Stock",NASDAQ,common_stock,0001783879
 HOPE,"Hope Bancorp, Inc. - Common Stock",NASDAQ,common_stock,0001128361
-HOS,"Hornbeck Offshore Services, Inc. Common Stock",NYSE,common_stock,
+HOS,"Hornbeck Offshore Services, Inc. Common Stock",NYSE,common_stock,0000866829
 HOUR,"Hour Loop, Inc. - common stock",NASDAQ,common_stock,0001874875
 HOV,"Hovnanian Enterprises, Inc. Class A Common Stock",NYSE,common_stock,0000357294
 HOVR,New Horizon Aircraft Ltd. - Class A Ordinary Shares,NASDAQ,common_stock,0001930021
@@ -3006,6 +3008,7 @@ KRNY,Kearny Financial - Common Stock,NASDAQ,common_stock,0001617242
 KRO,Kronos Worldwide Inc Common Stock,NYSE,common_stock,0001257640
 KROS,"Keros Therapeutics, Inc. - common stock",NASDAQ,common_stock,0001664710
 KRRO,"Korro Bio, Inc. - Common Stock",NASDAQ,common_stock,0001703647
+KRSA,"Korsana Biosciences, Inc. - Common Stock",NASDAQ,common_stock,0001755237
 KRSP,Rice Acquisition Corporation 3 Class A Ordinary Shares,NYSE,common_stock,0002074872
 KRT,Karat Packaging Inc. - Common Stock,NASDAQ,common_stock,0001758021
 KRUS,"Kura Sushi USA, Inc. - Class A Common Stock",NASDAQ,common_stock,0001772177
@@ -3027,7 +3030,6 @@ KUST,"Kustom Entertainment, Inc. - Common Stock",NASDAQ,common_stock,0001342958
 KVHI,"KVH Industries, Inc. - Common Stock",NASDAQ,common_stock,0001007587
 KVUE,Kenvue Inc. Common Stock,NYSE,common_stock,0001944048
 KVYO,"Klaviyo, Inc. Series A Common Stock",NYSE,common_stock,0001835830
-KWM,"K Wave Media, Ltd. - Ordinary Shares",NASDAQ,common_stock,0002000756
 KWR,Quaker Houghton Common Stock,NYSE,common_stock,0000081362
 KWY,Kingsway Corporation Common Stock,NYSE,common_stock,0001072627
 KXIN,Kaixin Holdings - Ordinary Shares,NASDAQ,common_stock,0001713539
@@ -3186,7 +3188,6 @@ LPCV,Launchpad Cadenza Acquisition Corp I - Class A Ordinary Share,NASDAQ,common
 LPG,Dorian LPG Ltd. Common Stock,NYSE,common_stock,0001596993
 LPL,"LG Display Co, Ltd AMERICAN DEPOSITORY SHARES",NYSE,common_stock,0001290109
 LPLA,LPL Financial Holdings Inc. - Common Stock,NASDAQ,common_stock,0001397911
-LPSN,"LivePerson, Inc. - Common Stock",NASDAQ,common_stock,0001102993
 LPTH,"LightPath Technologies, Inc. - Class A Common Stock",NASDAQ,common_stock,0000889971
 LPX,Louisiana-Pacific Corporation Common Stock,NYSE,common_stock,0000060519
 LQDA,Liquidia Corporation - Common Stock,NASDAQ,common_stock,0001819576
@@ -3843,6 +3844,7 @@ NWS,News Corporation - Class B Common Stock,NASDAQ,common_stock,0001564708
 NWSA,News Corporation - Class A Common Stock,NASDAQ,common_stock,0001564708
 NWTG,"Newton Golf Company, Inc. - Common Stock",NASDAQ,common_stock,0001934245
 NX,Quanex Building Products Corporation Common Stock,NYSE,common_stock,0001423221
+NXAT,Nexus Advanced Technologies Inc. - Ordinary Shares,NASDAQ,common_stock,0002000756
 NXB,NextBoat Inc. Common Stcok,NYSE American,common_stock,0002067767
 NXDR,"Nextdoor Holdings, Inc. Class A Common Stock",NYSE,common_stock,0001846069
 NXDT,NexPoint Diversified Real Estate Trust Common Stock,NYSE,common_stock,0001356115
@@ -3884,6 +3886,7 @@ OCCI,"OFS Credit Company, Inc. - Closed End Fund",NASDAQ,common_stock,0001716951
 OCFC,OceanFirst Financial Corp. - Common Stock,NASDAQ,common_stock,0001004702
 OCG,Oriental Culture Holding LTD - Ordinary Shares,NASDAQ,common_stock,0001776067
 OCGN,"Ocugen, Inc. - Common Stock",NASDAQ,common_stock,0001372299
+OCLT,OceanLight Acquisition Corporation - Ordinary Shares,NASDAQ,common_stock,0002137679
 OCS,Oculis Holding AG - Ordinary shares,NASDAQ,common_stock,0001953530
 OCSL,Oaktree Specialty Lending Corporation - Closed End Fund,NASDAQ,common_stock,0001414932
 OCTV,Octave Intelligence plc - Class B Ordinary Shares,NASDAQ,common_stock,0002083632
@@ -4160,7 +4163,6 @@ PH,Parker-Hannifin Corporation Common Stock,NYSE,common_stock,0000076334
 PHAR,"Pharming Group N.V. - ADS, each representing 10 ordinary shares",NASDAQ,common_stock,0001828316
 PHAT,"Phathom Pharmaceuticals, Inc. - Common Stock",NASDAQ,common_stock,0001783183
 PHG,Koninklijke Philips N.V. NY Registry Shares,NYSE,common_stock,0000313216
-PHGE,BiomX Inc. COmmon Stock,NYSE American,common_stock,0001739174
 PHI,PLDT Inc. Sponsored ADR,NYSE,common_stock,0000078150
 PHIN,PHINIA Inc. Common Stock,NYSE,common_stock,0001968915
 PHIO,Phio Pharmaceuticals Corp. - Common Stock,NASDAQ,common_stock,0001533040
@@ -4219,7 +4221,7 @@ PLX,"Protalix BioTherapeutics, Inc. (DE) Common Stock",NYSE American,common_stoc
 PLXS,Plexus Corp. - Common Stock,NASDAQ,common_stock,0000785786
 PLYX,"Polaryx Therapeutics, Inc. - Common Stock",NASDAQ,common_stock,0002075320
 PM,Philip Morris International Inc Common Stock,NYSE,common_stock,0001413329
-PMA,Ming Shing Group Holdings Limited - Ordinary Shares,NASDAQ,common_stock,0001956166
+PMA,PMA Graphene Technology Group Inc. - Class A Ordinary Shares,NASDAQ,common_stock,0001956166
 PMAX,Powell Max Limited - Class A Ordinary Shares,NASDAQ,common_stock,0002012096
 PMCB,"PharmaCyte  Biotech, Inc. - Common Stock",NASDAQ,common_stock,0001157075
 PMEC,Primech Holdings Ltd. - Ordinary Shares,NASDAQ,common_stock,0001891944
@@ -4422,7 +4424,6 @@ RANI,"Rani Therapeutics Holdings, Inc. - Class A Common Stock",NASDAQ,common_sto
 RAPP,"Rapport Therapeutics, Inc. - Common Stock",NASDAQ,common_stock,0002012593
 RARE,Ultragenyx Pharmaceutical Inc. - Common Stock,NASDAQ,common_stock,0001515673
 RAVE,"Rave Restaurant Group, Inc. - Common Stock",NASDAQ,common_stock,0000718332
-RAY,Raytech Holding Limited - Ordinary Shares,NASDAQ,common_stock,0001948443
 RAYA,Erayak Power Solution Group Inc. - Class A Ordinary Shares,NASDAQ,common_stock,0001825875
 RBA,"RB Global, Inc. Common Stock",NYSE,common_stock,0001046102
 RBB,RBB Bancorp - Common Stock,NASDAQ,common_stock,0001499422
@@ -4549,6 +4550,7 @@ RMCO,Royalty Management Holding Corporation - Class A Common Stock,NASDAQ,common
 RMD,ResMed Inc. Common Stock,NYSE,common_stock,0000943819
 RMI,"RiverNorth Opportunistic Municipal Income Fund, Inc. Common Stock",NYSE,common_stock,0001746967
 RMIX,"Suncrete, Inc. - Class A Common Stock",NASDAQ,common_stock,0002094433
+RML,Resolution Minerals Ltd - American Depositary Shares,NASDAQ,common_stock,0002102907
 RMM,"RiverNorth Managed Duration Municipal Income Fund, Inc. Common Stock",NYSE,common_stock,0001771226
 RMMZ,"RiverNorth Managed Duration Municipal Income Fund II, Inc. Common Stock",NYSE,common_stock,0001870833
 RMNI,"Rimini Street, Inc. - Common Stock",NASDAQ,common_stock,0001635282
@@ -4719,7 +4721,7 @@ SDHY,PGIM Short Duration High Yield Opportunities Fund Common Shares,NYSE,common
 SDOT,Sadot Group Inc. - Common Stock,NASDAQ,common_stock,0001701756
 SDRL,Seadrill Limited Common Shares,NYSE,common_stock,0001737706
 SDST,Stardust Power Inc. - Common Stock,NASDAQ,common_stock,0001831979
-SE,"Sea Limited American Depositary Shares, each representing one Class A Ordinary Share",NYSE,common_stock,
+SE,"Sea Limited American Depositary Shares, each representing one Class A Ordinary Share",NYSE,common_stock,0001703399
 SEAT,Vivid Seats Inc. - Class A common stock,NASDAQ,common_stock,0001856031
 SEB,Seaboard Corporation Common Stock,NYSE American,common_stock,0000088121
 SECZ,Securitize Corp. Common Stock,NYSE,common_stock,0002094496
@@ -4764,7 +4766,7 @@ SGLY,Singularity Future Technology Ltd. - Common Stock,NASDAQ,common_stock,00014
 SGML,Sigma Lithium Corporation - common shares,NASDAQ,common_stock,0001848309
 SGMT,Sagimet Biosciences Inc. - Series A Common Stock,NASDAQ,common_stock,0001400118
 SGP,"SpyGlass Pharma, Inc. - Common Stock",NASDAQ,common_stock,0001778922
-SGRX,SANGRIX INC. - Class A Ordinary Shares,NASDAQ,common_stock,
+SGRX,SANGRIX INC. - Class A Ordinary Shares,NASDAQ,common_stock,0001735556
 SGRY,"Surgery Partners, Inc. - Common Stock",NASDAQ,common_stock,0001638833
 SGU,Star Group L.P. Common Stock,NYSE,common_stock,0001002590
 SHAK,"Shake Shack, Inc. Class A Common Stock",NYSE,common_stock,0001620533
@@ -5072,6 +5074,7 @@ SWIM,"Latham Group, Inc. - Common Stock",NASDAQ,common_stock,0001833197
 SWK,"Stanley Black & Decker, Inc. Common Stock",NYSE,common_stock,0000093556
 SWKS,"Skyworks Solutions, Inc. - Common Stock",NASDAQ,common_stock,0000004127
 SWMR,"Swarmer, Inc - common stock",NASDAQ,common_stock,0002092574
+SWRD,Stewards Inc - Common Stock,NASDAQ,common_stock,0001795851
 SWVL,Swvl Holdings Corp - Ordinary Shares,NASDAQ,common_stock,0001875609
 SWX,"Southwest Gas Holdings, Inc. Common Stock (DE)",NYSE,common_stock,0001692115
 SWZ,Total Return Securities Fund Common Stock,NYSE,common_stock,0000813623
@@ -5840,7 +5843,7 @@ YDKG,Yueda Digital Holding - Class A Ordinary Share,NASDAQ,common_stock,00014137
 YELP,Yelp Inc. Common Stock,NYSE,common_stock,0001345016
 YETI,"YETI Holdings, Inc. Common Stock",NYSE,common_stock,0001670592
 YEXT,"Yext, Inc. Common Stock",NYSE,common_stock,0001614178
-YFOR,YYForce Inc. - Class A Ordinary Shares,NASDAQ,common_stock,
+YFOR,YYForce Inc. - Class A Ordinary Shares,NASDAQ,common_stock,0001985337
 YHC,LQR House Inc. - Common Stock,NASDAQ,common_stock,0001843165
 YHGJ,Yunhong Green CTI Ltd. - Common Stock,NASDAQ,common_stock,0001042187
 YHNA,YHN Acquisition I Limited - Ordinary Shares,NASDAQ,common_stock,0002020987
