@@ -15,10 +15,19 @@ APIs (Yahoo via yfinance, SEC EDGAR).
 """
 import argparse
 import time
+from datetime import datetime, timezone
 
 from compute_moving_averages import compute_and_store as compute_moving_averages
 from compute_price_indicators import compute_and_store as compute_price_indicators
-from db import get_universe, init_db, upsert_tickers
+from db import (
+    get_last_fetch_success,
+    get_universe,
+    init_db,
+    log_fetch,
+    upsert_tickers,
+)
+from fetch_benchmark_prices import fetch_benchmark_prices
+from fetch_earnings_events import fetch_earnings_events_for
 from fetch_fundamentals import fetch_fundamentals_for
 from fetch_industry_classification import fetch_industry_classification
 from fetch_insider_transactions import fetch_insider_transactions
@@ -39,6 +48,13 @@ def run_prices_stage(symbols):
     print(f"[prices] fetching OHLCV for {len(symbols)} tickers...")
     result = fetch_prices_for(symbols)
     print(f"[prices] done: {result}")
+    return result
+
+
+def run_benchmark_prices_stage():
+    print("[benchmark_prices] fetching SPY/MDY/IJR for the cap_rotation_momentum feature...")
+    result = fetch_benchmark_prices()
+    print(f"[benchmark_prices] done: {result}")
     return result
 
 
@@ -67,12 +83,44 @@ def run_fundamentals_stage(symbol_cik_pairs):
     return result
 
 
-def run_industry_stage(tickers):
-    # Stable for years at a time -- monthly cadence, same reasoning as
-    # fundamentals.
+# A company's SIC code is stable for years, so the monthly run only fills
+# gaps (tickers with no stored classification -- new listings and earlier
+# failures) and a whole-universe sweep runs once a year to pick up genuine
+# reclassifications. The sweep date is recorded in fetch_log under this
+# sentinel symbol.
+INDUSTRY_FULL_REFRESH_DAYS = 365
+INDUSTRY_REFRESH_MARKER = "__ALL__"
+INDUSTRY_REFRESH_KIND = "industry_full_refresh"
+
+
+def _industry_full_refresh_due(last_full):
+    """True when no whole-universe sweep is recorded, or the last one is
+    older than INDUSTRY_FULL_REFRESH_DAYS. Date-based rather than
+    calendar-month-based so a missed run still triggers the sweep later
+    instead of skipping that year entirely."""
+    if not last_full:
+        return True
+    try:
+        last = datetime.strptime(last_full, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return True
+    now = datetime.now(timezone.utc).replace(tzinfo=None)  # fetch_log stores UTC
+    return (now - last).days >= INDUSTRY_FULL_REFRESH_DAYS
+
+
+def run_industry_stage(tickers, full_refresh=None):
     pairs = [(t["symbol"], t["cik"]) for t in tickers if t["cik"]]
-    print(f"[industry] fetching SEC SIC classification for {len(pairs)} tickers...")
-    result = fetch_industry_classification(pairs, verbose=False)
+    last_full = get_last_fetch_success(INDUSTRY_REFRESH_MARKER, INDUSTRY_REFRESH_KIND)
+    if full_refresh is None:
+        full_refresh = _industry_full_refresh_due(last_full)
+    mode = "full refresh" if full_refresh else "gap-fill only"
+    print(
+        f"[industry] SEC SIC classification, {mode} "
+        f"({len(pairs)} tickers with a CIK, last full sweep: {last_full or 'never'})"
+    )
+    result = fetch_industry_classification(pairs, verbose=False, full_refresh=full_refresh)
+    if full_refresh and result["failed"] == 0:
+        log_fetch(INDUSTRY_REFRESH_MARKER, INDUSTRY_REFRESH_KIND, "ok")
     print(f"[industry] done: {result}")
     return result
 
@@ -88,10 +136,22 @@ def run_insider_transactions_stage(tickers):
     return n
 
 
+def run_earnings_events_stage(tickers):
+    # Earnings are quarterly, so monthly is more than frequent enough --
+    # same reasoning as fundamentals/industry. Full refetch every time
+    # (~1hr for the whole universe): get_earnings_dates() has no
+    # incremental/delta mode, and it's still cheap enough at this cadence.
+    symbols = [t["symbol"] for t in tickers]
+    print(f"[earnings_events] fetching earnings dates/surprises for {len(symbols)} tickers...")
+    result = fetch_earnings_events_for(symbols, verbose=False)
+    print(f"[earnings_events] done: {result}")
+    return result
+
+
 
 ALL_STAGES = (
     "universe", "prices", "moving_averages", "price_indicators",
-    "fundamentals", "industry", "insider_transactions",
+    "fundamentals", "industry", "insider_transactions", "earnings_events",
 )
 
 # Stages worth running on a weekly cadence: universe (cheap, catches new
@@ -137,7 +197,7 @@ def main():
     if "price_indicators" in active_stages:
         run_price_indicators_stage()
 
-    needs_tickers = active_stages & {"prices", "fundamentals", "industry", "insider_transactions"}
+    needs_tickers = active_stages & {"prices", "fundamentals", "industry", "insider_transactions", "earnings_events"}
     if needs_tickers:
         tickers = get_universe()
         if not tickers:
@@ -158,6 +218,9 @@ def main():
 
         if "insider_transactions" in active_stages:
             run_insider_transactions_stage(tickers)
+
+        if "earnings_events" in active_stages:
+            run_earnings_events_stage(tickers)
 
     elapsed = time.time() - start
     print(f"\nDone in {elapsed:.1f}s")
