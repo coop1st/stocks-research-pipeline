@@ -304,6 +304,336 @@ to the CSV.
 
 ---
 
+## Day trading model (five attempts -- first four null, fifth found a real signal, nothing live yet)
+
+Explored whether short-horizon price moves could be forecast well enough
+to trade -- a quick buy-open/take-profit-or-stop-loss strategy. The first
+four attempts found no exploitable edge (documented below so the same
+dead ends aren't re-explored without knowing why they failed); the fifth
+found a real, unusually robust signal in a feature everywhere else in
+this document only got to ~0 validated IC (see the RSI indicator row
+above -- that's a different target/horizon, a cross-sectional weekly
+score, not a contradiction, but worth flagging explicitly since it reads
+like one at a glance). **Nothing built from any of this is live** -- the
+fifth attempt is a backtested finding, not a deployed strategy.
+
+**Setup**: `price_indicators` gained `volatility_3d`/`volatility_7d`
+(trailing stdev of daily adj_close returns) and `dollar_volume_avg_20d`
+(a liquidity proxy, since no market-cap field exists in this pipeline) --
+see `compute_price_indicators.py`. `model/daytrade_features.py` builds a
+feature panel (volatility_3d/7d, rsi_14, range_position_52w,
+pct_from_52w_high, today's opening gap, today's own intraday range,
+volume vs. its 20-day average) with 3 candidate labels: next day's
+`(high - open) / open >= {3%, 5%, 7%}`. `model/daytrade_backtest.py` fits
+logistic regression and gradient boosting on an expanding walk-forward
+window (12-month warm-up, 3-month test blocks, 5-trading-day embargo --
+model/backtest.py's leave-one-year-out design doesn't transfer to a
+1-day-horizon target since daily observations are heavily autocorrelated
+and a naive split would leak).
+
+**First result looked implausibly good**: out-of-sample Spearman IC of
+**+0.38 average, correctly signed in 15/15 folds** -- far stronger than
+any validated indicator here (valuation's +0.26 is the strongest, on a
+much easier 1-year-forward target). A permutation test (shuffling the
+label) correctly collapsed IC to ~0, ruling out a pipeline bug. Digging
+into which feature drove it (`volatility_7d` alone: IC +0.35) exposed the
+real explanation: **the label measures next-day volatility, not next-day
+direction**. `(high - open) / open` is mechanically large whenever a
+stock is volatile that day, whether it closes up or down -- checked
+directly: `volatility_7d` vs. next day's actual close-to-close return has
+IC **-0.02** (essentially nothing), and the highest-volatility quintile's
+mean net day is **-0.08%** (not positive). The model was correctly
+learning volatility clustering (a well-documented, unremarkable market
+effect -- current volatility predicts near-term volatility), not
+"forecasts a price increase."
+
+**The real test**: extended `daytrade_backtest.py` to simulate the actual
+trade rule instead of trusting the regression IC -- enter at next day's
+open, exit at whichever of a take-profit or a fixed -3% stop-loss the
+day's high/low touches first (assuming, pessimistically, that the
+stop-loss triggers first if both are touched the same day, since only
+OHLC bars are available and there's no real intraday sequencing), else
+exit at close. Compared the model's flagged (top-decile probability)
+trades against a same-size **random** selection from the same liquid
+universe/day, across all 3 thresholds x 2 models x 15 folds (90
+fold-combinations total).
+
+**Results**: the model's picks underperformed random selection in
+**every single one of the 90 fold-combinations** -- e.g. at the 3%
+threshold, model trades averaged -0.72%/trade vs. random's -0.09%/trade.
+Not "no better than random" -- consistently *worse*. This makes sense
+given the volatility-clustering finding above: the model is selecting
+more-volatile stocks without any offsetting directional edge, so under
+the pessimistic (but realistic, given the data available) stop-loss-first
+assumption, its picks get whipsawed and stopped out more often than a
+random pick would.
+
+**Verdict: no-go.** This does not clear the bar the other indicators were
+held to, and the daily automation this would have needed (shortlist,
+cloud price fetch, paper-trade ledger, news-catalyst scan, Gmail alerts)
+was never built.
+
+### Second attempt: fixed the label, added trend/moving-average features -- still no-go
+
+Retried with two changes meant to directly address the first attempt's
+diagnosis: (1) trained on genuine next-day direction instead of intraday
+range -- new `close_up_{1,2,3}` labels, `close_to_close_next =
+(next_close - next_open) / next_open >= {1%, 2%, 3%}` -- and (2) added
+features that might actually carry directional information:
+`trend_points` (trend.py's exact 4-point bull/bear moving-average
+checklist, recomputed here across full history since `moving_averages`
+-- unlike `ratings` -- is recomputed in full every run, not weekly-
+overwritten), `price_vs_sma20/50/100/200`, and `return_20d` (short-
+horizon momentum, closer to the trading horizon than the existing 6/12-
+month momentum indicator). Trade simulation reused the same TP/SL/close
+rule, with stop-loss matched 1:1 to each smaller direction threshold
+(rather than the first attempt's fixed 3% stop against larger 3/5/7%
+targets).
+
+**Before even running the full backtest**, checking each feature's raw
+Spearman IC against genuine next-day direction was cheap and telling:
+every single feature -- including the new trend/moving-average ones --
+came back within noise of zero (all |IC| <= 0.02, matching the noise
+floor a shuffled-label permutation test showed). `trend_points`: -0.004.
+`price_vs_sma20`: -0.004. `return_20d`: -0.002. None of the (otherwise
+useful, validated-elsewhere) technical indicators available in this
+pipeline carry next-day directional information on their own.
+
+**Full backtest confirmed it, more cleanly than the first attempt**:
+average OOS IC came back *negative* (-0.02 to -0.03 depending on
+threshold/model, correctly signed in only 1-3 of 13 folds -- the model is
+essentially fitting in-sample noise that doesn't generalize, not finding
+a real inverse relationship either). Trade simulation: the model's
+flagged picks underperformed a same-size random selection in **all 78
+fold-combinations tested** (3 thresholds x 2 models x 13 folds), by
+-0.36 to -0.67 percentage points per trade on average.
+
+**Takeaway**: this isn't "the first attempt's label was the whole
+problem" -- it's that this pipeline's available features (price/volume-
+derived technicals: volatility, RSI, 52-week range, moving averages,
+short-horizon momentum) carry no next-day directional signal for
+individual liquid stocks, under either framing tried. That's the
+expected result for well-known technical signals in liquid markets (any
+edge from information this public would already be arbitraged away at a
+1-day horizon) -- not a bug, not a modeling failure, a real null result
+across two honest attempts. A third attempt would need genuinely
+different information, not a different label or a different classifier
+on the same technical inputs -- e.g. news/sentiment features (this
+pipeline's existing `claude -p` + WebSearch pattern, used for the weekly
+industry-sentiment overlay, is a plausible source), order-flow/options-
+market data, or earnings-surprise proximity -- none of which are
+currently available in this pipeline and would need new data sources
+built first, not just new feature engineering on data already collected.
+
+### Third attempt: real new data (PEAD) + a wider 5-day target -- also no-go, but not as cleanly null
+
+Post-earnings-announcement drift (PEAD) -- prices keep drifting in the
+direction of an earnings surprise for weeks afterward -- is one of the
+most robust, widely-replicated anomalies in finance, unlike the
+well-known technical signals attempts 1-2 already ruled out. Built
+properly this time, with new data, not just new feature engineering:
+
+- **New `earnings_events` table** (`pipeline/fetch_earnings_events.py`),
+  populated from `yfinance`'s free `get_earnings_dates()` (EPS estimate,
+  actual, surprise %) across the full ~5,920-symbol universe: 4,675
+  symbols (79%) have coverage, 146,204 historical surprise data points,
+  zero fetch failures. Point-in-time correct via a computed
+  `effective_date` -- before-market-open announcements count from that
+  same trading day, after-close (or ambiguous-time) announcements count
+  from the next trading day, verified directly against real timestamps
+  (DDOG's 7am announcements vs. AAPL's 4pm ones).
+- **Wider, differently-shaped target** (Kevin's direction, moving away
+  from the single-day framing both prior attempts used): `label_5day` =
+  at least 3 of the next 5 trading days close up day-over-day AND the
+  high somewhere in that window reaches >=3% above the origin close.
+  Unlike attempt 1's flawed label, this one's construction was sanity-
+  checked against genuine direction before trusting it (IC of the label
+  itself vs. `forward_return_5` = +0.68, strongly positive as expected).
+- **PEAD features**: `earnings_surprise_pct` and `days_since_earnings`
+  (trading days since the most recent known surprise, not calendar days),
+  added to the existing technical feature set (attempt 2's set, kept as
+  a baseline for comparison, not because it was expected to help).
+- **Multi-day trade simulation**: entry at day 1's open, walks all 5 days
+  checking take-profit (3%, matching the label) / stop-loss (5%, wider
+  than before given the longer hold) in sequence, same pessimistic
+  same-day tie-break as attempts 1-2. 10-trading-day embargo (widened
+  from 5, since the label now depends on 5 future days, not 1).
+
+**Raw per-feature IC against genuine direction** (`forward_return_5`):
+every feature, PEAD included, came back within noise
+(`earnings_surprise_pct` +0.014, `days_since_earnings` -0.002, both
+comparable to every technical feature already ruled out).
+
+**Full backtest**: logistic regression came back essentially null again
+(IC -0.002, 7/13 folds positive -- a coin flip; trade-sim edge -0.361%/
+trade, 0/13 folds positive). Gradient boosting showed something weakly
+different from pure noise for the first time across all three
+attempts -- IC +0.016 (real but tiny; for scale, the validated valuation
+indicator sits at 0.26, and the go/no-go bar set in attempt 1 was
+0.05-0.08), correctly signed in 9/13 folds. But the trade simulation
+still says no: average edge over random was **-0.068%/trade**, and only
+7/13 folds (barely better than a coin flip) showed positive edge, with
+the losing folds losing more than the winning folds won -- the classic
+signature of a model fitting noise, not a real, exploitable edge.
+
+**Verdict: no-go, same as attempts 1-2**, but worth being precise about
+what's different this time: this isn't a clean null result like the
+first two (where the deciding metric was flatly zero or the model lost
+every single fold). Gradient boosting with PEAD features produced a
+faint, real-but-tiny signal that doesn't survive contact with an honest
+trade simulation. That's still a no -- don't build the automation this
+would have needed (daily fetch, shortlist, paper-trade ledger, news
+scan, alerts) -- but it's a different flavor of no than "nothing here at
+all," and if this is ever revisited, gradient boosting with a richer
+PEAD feature set (e.g. surprise magnitude interacted with days-since,
+rather than as separate linear features; a revenue-surprise counterpart,
+not just EPS) is a more promising next step than the technical-indicator
+dead end attempts 1-2 already closed off. The `earnings_events` table
+and PEAD feature-building code are kept in the pipeline (not deleted)
+specifically so that follow-up doesn't have to redo this data-gathering
+work.
+
+### Fourth attempt: market-cap-bucketed multi-indicator model -- still no-go, but the calibration work is reusable
+
+Kevin's direction: (1) a 90-day volume Z-score feature, (2) an RSP/SPY-
+style ratio (equal-weight vs. cap-weight breadth, and MDY/SPY, IJR/SPY
+for mid/small-cap rotation) as a market-regime signal, (3) separate
+models per market-cap bucket instead of one pooled model. Built all
+three, plus fixed a real bug found along the way:
+
+- **Liquidity-filter-ordering bug fixed**: `daytrade_features.py`'s
+  liquidity filter ran *after* the four expensive confluence-feature
+  `merge_asof` calls instead of before, so those merges operated on the
+  full ~6.37M-row universe instead of the ~2M-row liquid subset -- the
+  root cause of two prior OOM crashes (documented in HANDOVER.md, not
+  reproduced here). Fixed by reordering: momentum (needs full per-symbol
+  row-contiguity for its row-position `pct_change`) stays before the
+  filter; valuation/quality/insider/cap-rotation (all `merge_asof`-by-
+  actual-date, unaffected by which rows survive filtering) moved after
+  it. Confirmed fixed by memory-monitored reruns: full panel build now
+  completes reliably in ~110-130s, peaking a consistent ~9.3-9.7GB (this
+  machine now has enough free memory to absorb that peak; the earlier
+  crashes happened when only ~2.2GB was free -- the fix is that the
+  process now *returns* instead of growing unboundedly, not a claim that
+  peak memory dropped).
+- **Market-cap buckets**: Large (>=$10B) / Mid ($2-10B) / Small ($300M-
+  2B), micro/nano (<$300M) excluded entirely, not folded into Small --
+  checked against the actual liquid-symbol distribution first: only ~143
+  of 2,132 liquid symbols fall under $300M, too thin to model separately
+  once the existing $5M/day liquidity floor is applied.
+- **`benchmark_prices` table** (`pipeline/fetch_benchmark_prices.py`,
+  SPY/MDY/IJR) -- deliberately a separate table from `prices`, wired into
+  the weekly scheduled job, because `snapshot.py` and other live-ratings
+  scripts read `FROM prices` with no symbol allowlist; benchmark ETFs
+  stored there would leak into the live weekly recommendation output.
+- **`cap_rotation_momentum` feature** (`daytrade_confluence_features.py`):
+  quarter-over-quarter (63-trading-day) rate of change of each ratio's
+  1-year-smoothed level, signed so positive always means "capital
+  rotating toward this stock's bucket" -- Mid = +MDY/SPY, Small =
+  +IJR/SPY, Large = -mean(MDY/SPY, IJR/SPY) (no natural "Large/SPY" ratio
+  exists since SPY effectively *is* large-cap; MDY and IJR are 0.81-
+  correlated, so averaging rather than picking one arbitrarily).
+  `volume_zscore_90d` (per-symbol 90-day rolling Z-score of raw volume)
+  added alongside the existing `volume_vs_avg20d` ratio feature.
+- **Trade-rule calibration was a real, separate confound worth
+  documenting on its own**: the original 2%-take-profit/5%-stop-loss rule
+  (inherited from attempt 3) has a 2.5x risk:reward ratio that turned out
+  to be structurally unfavorable -- an *unconditional* "enter every trade,
+  no model" test showed the random baseline itself was flat-to-negative,
+  worse for smaller/more volatile buckets, because the 5% stop was
+  *tighter than ordinary 5-day price noise* (median max-downside
+  excursion from entry alone was -2.4% to -3.9% across buckets) and was
+  catching genuine future winners as false stop-outs. Progressively
+  widening the stop (up to 20%) and varying take-profit (1-2%) and
+  horizon (5/10/20 trading days) took the unconditional baseline from
+  negative to consistently positive across every bucket -- but the full
+  23-feature ensemble never once cleared this project's go/no-go bar
+  (edge > 0 in a clear majority of folds) at any calibration tested, in
+  any bucket, with either model (logistic regression or gradient
+  boosting). A no-stop-loss variant (exit only on take-profit, ride the
+  full horizon otherwise, label switched from "best close reached" to
+  "best intraday high reached") was also tried and came back worse than
+  every stop-loss variant tested -- confirming the stop genuinely caps
+  real tail risk, not just adding drag from being too tight.
+
+**Verdict: no-go for the full multi-feature ensemble**, consistent with
+attempts 1-3. But unlike those, the *trade-rule calibration itself* -- not
+the feature set -- was doing a lot of the damage, and that finding
+generalizes: any future attempt on this model should start from a wide
+stop-loss (12.5-20%, not 5%) matched to the horizon's actual volatility,
+not the original 2%/5% rule. The bucket infrastructure, `benchmark_prices`
+table, and `cap_rotation_momentum`/`volume_zscore_90d` features are kept,
+not deleted -- they fed directly into the fifth attempt below.
+
+### Fifth attempt: RSI alone -- the first real signal across five attempts, not yet live
+
+Dissecting why the fourth attempt's ensemble kept losing to random led to
+testing each of the 23 `FEATURE_COLS` **individually** -- one feature,
+one gradient-boosting model, per bucket, at 1% take-profit / 17.5%
+stop-loss / 20-trading-day horizon (the calibration space attempt four
+had already validated as reasonable). One feature stood out immediately:
+
+**`rsi_14` alone was the #1 feature independently in all three buckets**,
+and beat the full 23-feature ensemble everywhere:
+
+| Bucket | rsi_14-alone edge | rsi_14-alone folds beating random | Full-ensemble edge |
+|---|---|---|---|
+| Large | +0.131%/trade | 10/13 | -0.035%/trade |
+| Mid | +0.152%/trade | 12/13 | +0.050%/trade |
+| Small | +0.122%/trade | 11/13 | -0.018%/trade |
+
+The same feature ranking #1 independently in three separately-tested
+buckets is much harder to explain as a multiple-comparisons artifact than
+a single lucky result would be -- if it were noise, the three buckets'
+winners wouldn't be expected to agree.
+
+**Stability-tested across the entire calibration space already explored
+in attempt four**, not just the one setup where it was found: 6 TP/SL
+combinations (spanning the original 2%/5% rule through the widest 2%/10%
+and 1.25%/20% variants) x 3 buckets at a 10-trading-day horizon --
+**18/18 positive-edge results**, every one with a majority of folds
+beating random. Repeated at a 5-trading-day horizon (5 combinations x 3
+buckets) -- **15/15 positive**, if anything *stronger and more
+consistent* than the longer horizons (Mid hit 12/13 folds, 92%, on two
+separate calibrations). **33/33 tests positive overall**, across three
+different horizons and six different TP/SL combinations, with no
+exceptions. The pattern (strongest at the shortest horizon, weakening
+gradually at 10 and 20 days) matches RSI's textbook role as a short-term
+overbought/oversold oscillator -- not just a number that happened to
+survive, a result with a coherent mechanistic story behind it.
+
+**Adding features back in did not help, and sometimes hurt --** tried
+three ways, all confirming RSI alone is the right stopping point, not an
+underbuilt starting point:
+1. A curated 8-11-feature "slim" set (every feature that individually
+   showed a positive edge and a fold-majority) underperformed rsi_14
+   alone in every bucket, and in Large was even worse than the full
+   23-feature kitchen sink (-0.063% vs. -0.035% vs. rsi_14 alone's
+   +0.131%).
+2. `rsi_14` + `days_since_earnings` (the one other feature that was
+   independently positive in all three buckets) for Large/Mid: edge and
+   fold-count both dropped in both buckets -- Large's fold-win-rate fell
+   from a 10/13 majority to 5/13, a minority.
+3. `rsi_14` + `volume_vs_avg20d` + `volume_zscore_90d` for Small: no
+   meaningful change either direction (+0.126% vs. +0.122% alone).
+
+**Verdict: the first genuinely positive result across five attempts on
+this model.** Not a large edge in absolute terms (best average ~+0.2%/
+trade before any transaction costs), and every test above comes from the
+same ~4.2-year local price history (2022-2026) -- one macro regime (the
+AI/mega-cap-concentration era identified in this session's RSP/SPY
+breadth analysis), not a genuinely independent out-of-sample era; the
+pipeline's `HISTORY_YEARS=5` config bounds what's available locally, and
+testing an earlier regime would need a much longer historical fetch, not
+attempted here. Nothing built from this is live -- no automation, no
+paper-trading, no slippage/cost modeling. Promising enough to be worth
+carrying to the next stage (a cost-aware simulation or live paper-
+trading) rather than shelving the way attempts 1-3 were, but "backtested
+well across many calibrations" and "ready to trade real money" are not
+the same claim.
+
+---
+
 ## Live scoring
 
 ```bash
