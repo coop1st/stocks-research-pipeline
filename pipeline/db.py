@@ -50,6 +50,9 @@ CREATE TABLE IF NOT EXISTS price_indicators (
     pct_from_52w_high REAL,
     pct_from_52w_low REAL,
     range_position_52w REAL,
+    volatility_3d REAL,
+    volatility_7d REAL,
+    dollar_volume_avg_20d REAL,
     PRIMARY KEY (symbol, date)
 );
 
@@ -95,9 +98,27 @@ CREATE TABLE IF NOT EXISTS fundamentals (
 );
 CREATE INDEX IF NOT EXISTS idx_fundamentals_symbol ON fundamentals(symbol);
 
+CREATE TABLE IF NOT EXISTS earnings_events (
+    symbol TEXT NOT NULL,
+    earnings_date TEXT NOT NULL,     -- full timestamp incl. time-of-day, as returned by yfinance
+    effective_date TEXT NOT NULL,    -- first trading-day close the market could have reacted by (BMO/AMC-aware, see fetch_earnings_events.py)
+    eps_estimate REAL,
+    reported_eps REAL,
+    surprise_pct REAL,
+    PRIMARY KEY (symbol, earnings_date)
+);
+CREATE INDEX IF NOT EXISTS idx_earnings_events_symbol ON earnings_events(symbol);
+
+CREATE TABLE IF NOT EXISTS benchmark_prices (
+    symbol TEXT NOT NULL,
+    date TEXT NOT NULL,
+    close REAL,
+    PRIMARY KEY (symbol, date)
+);
+
 CREATE TABLE IF NOT EXISTS fetch_log (
     symbol TEXT NOT NULL,
-    kind TEXT NOT NULL,  -- 'prices' or 'fundamentals'
+    kind TEXT NOT NULL,  -- 'prices', 'fundamentals', or 'earnings'
     last_success TEXT,
     last_status TEXT,
     last_error TEXT,
@@ -126,6 +147,9 @@ _MIGRATIONS = [
     ("tickers", "industry_sic", "TEXT"),
     ("tickers", "industry_sic_description", "TEXT"),
     ("tickers", "industry_category", "TEXT"),
+    ("price_indicators", "volatility_3d", "REAL"),
+    ("price_indicators", "volatility_7d", "REAL"),
+    ("price_indicators", "dollar_volume_avg_20d", "REAL"),
 ]
 
 
@@ -191,6 +215,30 @@ def upsert_prices(symbol, rows):
         )
 
 
+def upsert_benchmark_prices(symbol, rows):
+    """rows: iterable of dicts with date, close. Deliberately a separate
+    table from `prices` -- snapshot.py and other live-ratings scripts read
+    `FROM prices` with no symbol allowlist, so benchmark ETFs (SPY/MDY/IJR)
+    stored there would leak into the live weekly recommendation output."""
+    with get_connection() as conn:
+        conn.executemany(
+            """
+            INSERT INTO benchmark_prices (symbol, date, close)
+            VALUES (:symbol, :date, :close)
+            ON CONFLICT(symbol, date) DO UPDATE SET close=excluded.close
+            """,
+            [{**r, "symbol": symbol} for r in rows],
+        )
+
+
+def get_last_benchmark_price_date(symbol):
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT MAX(date) FROM benchmark_prices WHERE symbol = ?", (symbol,)
+        ).fetchone()
+        return row[0] if row and row[0] else None
+
+
 def upsert_moving_averages(symbol, rows):
     """rows: iterable of dicts with date, sma_20, sma_50, sma_100, sma_200"""
     with get_connection() as conn:
@@ -215,6 +263,25 @@ def upsert_fundamentals(symbol, rows):
             VALUES (:symbol, :metric, :fiscal_end, :form, :value, :filed_date)
             ON CONFLICT(symbol, metric, fiscal_end, form) DO UPDATE SET
                 value=excluded.value, filed_date=excluded.filed_date
+            """,
+            [{**r, "symbol": symbol} for r in rows],
+        )
+
+
+def upsert_earnings_events(symbol, rows):
+    """rows: iterable of dicts with earnings_date, effective_date,
+    eps_estimate, reported_eps, surprise_pct"""
+    with get_connection() as conn:
+        conn.executemany(
+            """
+            INSERT INTO earnings_events
+                (symbol, earnings_date, effective_date, eps_estimate, reported_eps, surprise_pct)
+            VALUES (:symbol, :earnings_date, :effective_date, :eps_estimate, :reported_eps, :surprise_pct)
+            ON CONFLICT(symbol, earnings_date) DO UPDATE SET
+                effective_date=excluded.effective_date,
+                eps_estimate=excluded.eps_estimate,
+                reported_eps=excluded.reported_eps,
+                surprise_pct=excluded.surprise_pct
             """,
             [{**r, "symbol": symbol} for r in rows],
         )
@@ -250,3 +317,34 @@ def get_universe(active_only=True):
         if active_only:
             q += " WHERE is_active = 1"
         return [dict(r) for r in conn.execute(q).fetchall()]
+
+
+def get_classified_symbols():
+    """Symbols that already have a stored SIC classification.
+
+    Used by the monthly industry stage to fetch only what's missing -- SIC
+    codes are stable for years, so refetching the whole universe every month
+    is ~5,500 wasted SEC requests.
+    """
+    with get_connection() as conn:
+        return {
+            r[0]
+            for r in conn.execute(
+                "SELECT symbol FROM tickers "
+                "WHERE industry_sic IS NOT NULL AND industry_sic <> ''"
+            )
+        }
+
+
+def get_last_fetch_success(symbol, kind):
+    """UTC timestamp of the last successful fetch_log entry, or None.
+
+    Also used with a sentinel symbol to record whole-universe sweeps (see
+    INDUSTRY_REFRESH_MARKER in run_pipeline.py).
+    """
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT last_success FROM fetch_log WHERE symbol = ? AND kind = ?",
+            (symbol, kind),
+        ).fetchone()
+        return row[0] if row and row[0] else None

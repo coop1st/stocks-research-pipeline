@@ -4,8 +4,14 @@ submissions endpoint and bucket it into a broad category (see
 SIC_CATEGORY_RANGES in config.py) for the industry-sentiment overlay.
 
 One request per CIK, same rate-limit pacing as fetch_fundamentals.py.
-Changes rarely (a company's SIC code is stable for years), so this only
-needs to run monthly, not weekly.
+
+A company's SIC code is stable for years, so by default this only fetches
+tickers that have no stored classification yet -- new listings and earlier
+failures. Reclassifications do happen occasionally, so run_industry_stage
+forces a whole-universe sweep once a year (full_refresh=True). Fetching all
+~5,900 CIKs monthly meant ~5,500 requests that rewrote the value they
+already held, each one downloading a company's entire filing history to
+read a single field.
 """
 import time
 
@@ -13,7 +19,7 @@ import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from config import SEC_USER_AGENT, sic_to_category
-from db import log_fetch, upsert_industry_classification
+from db import get_classified_symbols, log_fetch, upsert_industry_classification
 
 HEADERS = {"User-Agent": SEC_USER_AGENT}
 SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik}.json"
@@ -29,13 +35,18 @@ def _get_submission(cik):
     return r.json()
 
 
-def fetch_industry_classification(symbol_cik_pairs, verbose=True):
-    ok_count, fail_count, skip_count = 0, 0, 0
+def fetch_industry_classification(symbol_cik_pairs, verbose=True, full_refresh=False):
+    ok_count, fail_count, skip_count, already_count = 0, 0, 0, 0
     batch = []
+
+    already_classified = set() if full_refresh else get_classified_symbols()
 
     for symbol, cik in symbol_cik_pairs:
         if not cik:
             skip_count += 1
+            continue
+        if symbol in already_classified:
+            already_count += 1
             continue
         try:
             data = _get_submission(cik)
@@ -62,15 +73,30 @@ def fetch_industry_classification(symbol_cik_pairs, verbose=True):
     if batch:
         upsert_industry_classification(batch)
 
-    return {"ok": ok_count, "failed": fail_count, "skipped": skip_count}
+    return {
+        "ok": ok_count,
+        "failed": fail_count,
+        "skipped": skip_count,
+        "already_classified": already_count,
+    }
 
 
 if __name__ == "__main__":
+    import argparse
+
     from db import get_universe, init_db
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--full", action="store_true",
+        help="refetch every ticker, not just the ones with no stored SIC code",
+    )
+    args = parser.parse_args()
 
     init_db()
     universe = get_universe()
     pairs = [(t["symbol"], t["cik"]) for t in universe if t["cik"]]
-    print(f"Fetching industry classification for {len(pairs)} tickers...")
-    result = fetch_industry_classification(pairs)
+    mode = "full refresh" if args.full else "gap-fill only"
+    print(f"Fetching industry classification for {len(pairs)} tickers ({mode})...")
+    result = fetch_industry_classification(pairs, full_refresh=args.full)
     print(result)
