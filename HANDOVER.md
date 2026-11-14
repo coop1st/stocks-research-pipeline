@@ -5,6 +5,54 @@ another (cmd prompt, local). Everything referenced here is committed and
 pushed to `main` at https://github.com/coop1st/stocks-research-pipeline
 (public repo). Read this file first, then the READMEs it points to.
 
+## Day-trade model and daily shortlist (built 2026-08-18; status as of 2026-11-14)
+
+**The daily day-trade shortlist runs in the cloud, not on this PC.** It is a
+Claude Code cloud routine, Monday-Friday, running `cloud/daytrade_shortlist.py`
+against the published ratings snapshot and the model artifact (design:
+`docs/superpowers/specs/2026-08-18-daytrade-cloud-automation-design.md`). The
+local `daily` run type and the `StocksPipeline-DailyDayTrade` Windows task that
+the original 2026-08-18 note described were retired and do not exist:
+`pipeline/scheduled_run.py` accepts only `weekly`, `monthly` and `quarterly`,
+and the only Windows tasks are `StocksPipeline-WeeklyUpdate`,
+`StocksPipeline-MonthlyUpdate` and `StocksPipeline-QuarterlyValidation`. The
+local weekly job's `train_daytrade_model` stage retrains the model and publishes
+the lookup-table artifact the cloud routine reads.
+
+### What was built on 2026-08-18 (model summary)
+
+Full technical detail is in `model/README.md`'s "Day trading model"
+section (covers 5 attempts). Summary:
+
+- **Fixed the OOM bug** attempts 1-3 (see `model/README.md`) never diagnosed correctly on
+  their own -- liquidity-filter reordering in `daytrade_features.py`,
+  confirmed via memory-monitored reruns (~9.3-9.7GB peak, consistently
+  completing now vs. the prior unbounded crashes).
+- **Attempt 4** (market-cap-bucketed multi-indicator model, new
+  `cap_rotation_momentum`/`volume_zscore_90d` features, new
+  `benchmark_prices` table) -- still a clean no-go for the full
+  ensemble, but the trade-rule calibration work (the original 2%/5%
+  take-profit/stop-loss was structurally unfavorable, especially for
+  Mid/Small) is reusable and directly fed into attempt 5.
+- **Attempt 5 (the one that worked)**: `rsi_14` alone -- tested
+  individually against all 22 other features, it was the #1 feature
+  independently in all three buckets, and 33/33 stability tests across
+  three horizons and six calibrations came back positive. Every attempt
+  to add other features back in made it worse, not better.
+
+### Files from that session
+
+- `model/daytrade_features.py` and `model/daytrade_confluence_features.py`:
+  imported by `model/train_daytrade_model.py` (weekly job). Committed 2026-11-14.
+- `model/daytrade_live_shortlist.py`, `pipeline/daily_liquid_fetch.py`,
+  `pipeline/draft_daytrade_email.py`: the original local daily pipeline,
+  superseded by `cloud/daytrade_shortlist.py`. Left uncommitted on the owner's
+  PC (nothing tracked imports them).
+- `model/_*.py`: scratch analysis scripts from the exploration that led to
+  attempt 5. Gitignored and kept on disk in case the reasoning needs revisiting.
+
+---
+
 ## What this project is
 
 A free-data stock research pipeline: fetches prices (Yahoo/yfinance) and
@@ -94,9 +142,11 @@ check, and Gmail draft all run locally, as part of the same weekly job).
    Irish time (30 min after the weekly job, so on the Saturdays where
    they coincide they don't both write to the local SQLite database at
    once). Calls `python pipeline/scheduled_run.py monthly`, which runs
-   `fundamentals` → `insider_transactions` → `industry` (SEC fundamentals
-   refresh, insider Form 3/4/5 refetch, SIC industry reclassification —
-   all slow-changing enough that weekly cadence would be overkill).
+   four stages: `fundamentals` → `insider_transactions` → `industry` →
+   `earnings_events` (SEC fundamentals refresh, insider Form 3/4/5
+   refetch, SIC industry reclassification, and yfinance earnings dates /
+   EPS estimates / surprises — all slow-changing enough that weekly
+   cadence would be overkill).
    Anchored to the same reference week as the weekly task
    (2026-08-14) so the two stay in phase; first run 2026-08-15.
 9. **Weekly research + Gmail draft**: `pipeline/draft_weekly_email.py`,
@@ -138,7 +188,8 @@ check, and Gmail draft all run locally, as part of the same weekly job).
     for just those categories, apply the exclusion rule (drop STRONG BUY
     if its industry scores 5, drop STRONG SELL if its industry scores
     1), web-search recent headlines for the survivors, then draft (not
-    send) a Gmail email to owner-email-removed via `create_draft`. No
+    send) a Gmail email to the owner's address (STOCKS_REPORT_EMAIL env var, else
+    `pipeline/local_settings.json`; see Quick reference) via `create_draft`. No
     changes to the Windows Scheduled Task were needed — this rides along
     inside the existing `scheduled_run.py weekly` call.
   - **A cloud-side split was tried and reverted first**: a separate
@@ -176,12 +227,24 @@ check, and Gmail draft all run locally, as part of the same weekly job).
   certificate that Python's bundled OpenSSL validator rejects but
   Windows' native validator accepts. This is why every fetch script
   imports `config` first. It's a no-op if that's not an issue on
-  whatever machine picks this up next. One known gap: `yfinance`
-  internally uses `curl_cffi`, a separate TLS stack this fix doesn't
-  reach — if Norton's protection is active, yfinance calls can still
-  fail with cert errors even though everything else (SEC, Nasdaq) works
-  fine through plain `requests`. Not fixed, just documented (see
-  `pipeline/README.md`'s network note).
+  whatever machine picks this up next. **Now also fixed for `yfinance`
+  specifically** (2026-08-16): `yfinance` internally uses `curl_cffi`, a
+  separate TLS stack truststore's stdlib patch doesn't reach — this
+  showed up as `yf.download()`/`Ticker.history()`/`fast_info` all failing
+  with a curl_cffi `CertificateVerifyError` even though plain `requests`
+  calls to the same Yahoo endpoints worked fine. `config.py`'s
+  `_ensure_curl_cffi_trusts_os_certs()` fixes this the same way: exports
+  Windows' trusted ROOT/CA stores (via `ssl.enum_certificates`, already
+  includes whatever cert Norton injects) to
+  `data/cache/curl_cffi_ca_bundle.pem` and points `CURL_CA_BUNDLE` at it
+  — curl_cffi honors that env var like real curl does. Regenerated fresh
+  on every import (cheap, no staleness risk), Windows-only, and a no-op
+  if `CURL_CA_BUNDLE` is already set or nothing intercepts traffic on
+  whatever machine picks this up next. Confirmed working: `yf.download()`
+  (the pipeline's call pattern), 1-minute intraday bars via
+  `Ticker.history(interval="1m")`, and near-live quotes via `fast_info`
+  all now succeed with no manual setup beyond the normal `import config`
+  every fetch script already does first.
 - **`SEC_CONTACT_EMAIL` env var** must be set (used to build the SEC
   User-Agent header) — set persistently on this machine already via
   `[Environment]::SetEnvironmentVariable(...)`. Also stored as a GitHub
@@ -205,7 +268,7 @@ cd Projects/Stocks
 
 python pipeline/check_status.py              # is data current? did the last scheduled run succeed?
 python pipeline/scheduled_run.py weekly       # manually trigger the full weekly flow
-python pipeline/scheduled_run.py monthly      # manually trigger fundamentals/insider/industry refresh
+python pipeline/scheduled_run.py monthly      # manually trigger fundamentals/insider/industry/earnings refresh
 python pipeline/scheduled_run.py quarterly    # manually trigger backtest + validation + summary email
 python model/rate_universe.py                 # today's cheapest/most expensive (valuation only)
 python model/confluence.py                    # today's full recommendations, best/worst 15
@@ -213,3 +276,9 @@ git log --oneline -10                         # recent history
 gh run list --workflow=weekly-price-fetch.yml # cloud fetch run history
 Get-ScheduledTask -TaskName "StocksPipeline-*" # check all 3 local scheduled tasks (PowerShell)
 ```
+
+**Email recipient:** the weekly and quarterly Gmail drafts go to the address in
+the `STOCKS_REPORT_EMAIL` environment variable, or, if that is unset, the
+`report_email` value in `pipeline/local_settings.json` (gitignored, local only,
+e.g. `{"report_email": "you@example.com"}`). If neither is set the email stage
+fails with a clear error instead of drafting to nobody.

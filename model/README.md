@@ -442,7 +442,7 @@ properly this time, with new data, not just new feature engineering:
   same trading day, after-close (or ambiguous-time) announcements count
   from the next trading day, verified directly against real timestamps
   (DDOG's 7am announcements vs. AAPL's 4pm ones).
-- **Wider, differently-shaped target** (Kevin's direction, moving away
+- **Wider, differently-shaped target** (the owner's direction, moving away
   from the single-day framing both prior attempts used): `label_5day` =
   at least 3 of the next 5 trading days close up day-over-day AND the
   high somewhere in that window reaches >=3% above the origin close.
@@ -495,7 +495,7 @@ work.
 
 ### Fourth attempt: market-cap-bucketed multi-indicator model -- still no-go, but the calibration work is reusable
 
-Kevin's direction: (1) a 90-day volume Z-score feature, (2) an RSP/SPY-
+The owner's direction: (1) a 90-day volume Z-score feature, (2) an RSP/SPY-
 style ratio (equal-weight vs. cap-weight breadth, and MDY/SPY, IJR/SPY
 for mid/small-cap rotation) as a market-regime signal, (3) separate
 models per market-cap bucket instead of one pooled model. Built all

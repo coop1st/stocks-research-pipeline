@@ -16,7 +16,7 @@ sleep/resume event interrupted the long-running `claude -p` subprocess
 partway through — the run died with no checkpoint written and no
 Gmail draft produced, and had to be manually rerun the next morning.
 
-Kevin wants the daily task to run without the local PC being on or
+The owner wants the daily task to run without the local PC being on or
 awake at a specific time, while keeping the full capability of the
 existing task (same shortlist methodology, same email content and
 structure).
@@ -61,7 +61,7 @@ production code was touched by these tests. Findings:
 - Yahoo Finance was initially blocked by the account's network egress
   proxy (`EGRESS_BLOCKED` / proxy `403`, both for raw Python requests
   and for the `WebFetch` tool — same underlying proxy either way).
-  Fixed by Kevin adding `*.finance.yahoo.com`, `fc.yahoo.com`, and
+  Fixed by the owner adding `*.finance.yahoo.com`, `fc.yahoo.com`, and
   `*.fc.yahoo.com` to the account's egress allowlist (the same
   allowlist mechanism already used for the chocolate-digest routine's
   news sites). `fc.yahoo.com` (yfinance's cookie/crumb bootstrap host)
@@ -205,7 +205,7 @@ implementation-time step, not code.
      news items per stock.
   8. If the ratings CSV or model artifact can't be found, or is
      stale beyond a threshold (the weekly job missed its run), draft
-     an alert email instead of staying silent, per Kevin's direction.
+     an alert email instead of staying silent, per the owner's direction.
 
 ## Error handling
 
@@ -235,7 +235,7 @@ implementation-time step, not code.
 - **Retiring `daily_liquid_fetch.py` and `pipeline/draft_daytrade_email.py`**:
   once the cloud routine is live and verified, these two files have no
   caller left in the local pipeline. Whether to delete them, or keep
-  them as a documented manual/local fallback, is Kevin's call at
+  them as a documented manual/local fallback, is the owner's call at
   implementation time — not decided here.
 - **What happens to `model/daytrade_live_shortlist.py`**: its scoring
   logic is being reproduced (not imported) inside the cloud routine's
