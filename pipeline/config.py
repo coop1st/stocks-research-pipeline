@@ -86,6 +86,27 @@ _SEC_CONTACT_EMAIL = os.environ.get("SEC_CONTACT_EMAIL", "set-SEC_CONTACT_EMAIL-
 SEC_USER_AGENT = f"Personal stock research pipeline {_SEC_CONTACT_EMAIL}"
 SEC_REQUEST_PAUSE_SECONDS = 0.15  # SEC allows up to ~10 req/sec; stay well under
 
+# Recipient of the weekly/quarterly Gmail drafts. Kept out of the (public)
+# repo: read from the STOCKS_REPORT_EMAIL env var, else the "report_email"
+# key of the gitignored pipeline/local_settings.json.
+LOCAL_SETTINGS_PATH = PIPELINE_DIR / "local_settings.json"
+
+
+def report_email():
+    """Return the report recipient, or raise a clear error if none is set
+    (so an email stage fails loudly rather than drafting to nobody)."""
+    addr = os.environ.get("STOCKS_REPORT_EMAIL", "").strip()
+    if not addr and LOCAL_SETTINGS_PATH.exists():
+        import json
+        with open(LOCAL_SETTINGS_PATH, encoding="utf-8") as f:
+            addr = str(json.load(f).get("report_email", "")).strip()
+    if "@" not in addr:
+        raise RuntimeError(
+            "No report email recipient configured: set the STOCKS_REPORT_EMAIL "
+            f"env var or put {{\"report_email\": \"...\"}} in {LOCAL_SETTINGS_PATH}"
+        )
+    return addr
+
 # Universe sources (both free, no API key required)
 SEC_TICKER_MAP_URL = "https://www.sec.gov/files/company_tickers.json"
 NASDAQ_LISTED_URL = "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&exchange=nasdaq"

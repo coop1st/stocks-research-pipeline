@@ -22,13 +22,12 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from config import PROJECT_DIR
+from config import PROJECT_DIR, report_email
 
 VALIDATION_LOG_DIR = PROJECT_DIR / "data" / "logs" / "validation"
 BACKTEST_SCRIPT = PROJECT_DIR / "model" / "backtest.py"
 VALIDATE_INDICATORS_SCRIPT = PROJECT_DIR / "model" / "validate_indicators.py"
 MODEL_README = PROJECT_DIR / "model" / "README.md"
-RECIPIENT = "owner-email-removed"
 ALLOWED_TOOLS = "Read,Glob,mcp__claude_ai_Gmail__create_draft"
 SCRIPT_TIMEOUT_S = 1800
 CLAUDE_TIMEOUT_S = 1800
@@ -59,6 +58,7 @@ def run_validate_indicators_stage():
 
 
 def build_summary_prompt(backtest_log, validate_log):
+    recipient = report_email()  # raises if not configured
     return f"""You are checking whether this stock-rating model still looks
 healthy, as a quarterly sanity check. Work through these steps and don't
 stop until a Gmail draft has been created.
@@ -86,7 +86,7 @@ Steps:
    model is still doing its job. If either log file is missing, empty,
    or looks like an error trace rather than a report, say so explicitly
    in the email rather than guessing at numbers that aren't there.
-3. Draft (do NOT send) a Gmail email to {RECIPIENT} using the
+3. Draft (do NOT send) a Gmail email to {recipient} using the
    create_draft tool. Subject: "Quarterly model check -- <this week's
    date>". Body: one or two sentences per indicator on whether it still
    looks consistent with its documented baseline, and a clear top-line

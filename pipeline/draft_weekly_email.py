@@ -42,11 +42,10 @@ import subprocess
 
 import pandas as pd
 
-from config import PROJECT_DIR
+from config import PROJECT_DIR, report_email
 from db import get_connection
 
 RATINGS_DIR = PROJECT_DIR / "data" / "github_sync" / "ratings"
-RECIPIENT = "owner-email-removed"
 ALLOWED_TOOLS = "WebSearch,mcp__claude_ai_Gmail__create_draft"
 CLAUDE_TIMEOUT_S = 1800
 
@@ -164,6 +163,7 @@ PROMPT_COLS = ["symbol", "company_name", "industry_category", "recommendation", 
 
 
 def build_prompt():
+    recipient = report_email()  # raises if not configured
     ratings_path, shortlist = build_shortlist()
 
     if shortlist.empty:
@@ -206,7 +206,7 @@ Steps:
    recent (last 1-2 weeks) headlines/news and note anything interesting
    or relevant to the recommendation -- especially anything that seems to
    run counter to the model's call.
-4. Draft (do NOT send) a Gmail email to {RECIPIENT} using the
+4. Draft (do NOT send) a Gmail email to {recipient} using the
    create_draft tool. Subject: "Weekly stock picks -- <this week's
    date>". Structure the body in two top-level sections, "Buys" and
    "Sells", and within each section group tickers by industry_category
