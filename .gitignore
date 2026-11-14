@@ -28,3 +28,9 @@ __pycache__/
 # Editor/OS cruft
 .DS_Store
 Thumbs.db
+
+# Scratch analysis scripts (model/_*.py) -- kept on disk, not published.
+model/_*.py
+
+# Local-only settings, e.g. the report email recipient (see HANDOVER.md).
+pipeline/local_settings.json
