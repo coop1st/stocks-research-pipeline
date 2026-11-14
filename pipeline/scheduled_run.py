@@ -1,7 +1,7 @@
 """
 Unattended entry point for the Windows Scheduled Tasks that keep this
-pipeline updated (see data/logs/README.md for the schedule and how to
-change it).
+pipeline updated (see HANDOVER.md, "What's built and working", for the
+schedule of the StocksPipeline-* tasks and how to change it).
 
 Unlike run_pipeline.py (built for interactive use, where an exception
 crashing the process is fine -- you're watching it), this is built to run
