@@ -1,5 +1,6 @@
 """Shared configuration for the stock data pipeline."""
 import os
+import sys
 from pathlib import Path
 
 # Some local network setups (e.g. antivirus/firewall software that does TLS
@@ -17,6 +18,48 @@ truststore.inject_into_ssl()
 PIPELINE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = PIPELINE_DIR.parent
 DB_PATH = PROJECT_DIR / "data" / "db" / "stocks.db"
+
+
+def _ensure_curl_cffi_trusts_os_certs():
+    """truststore above only patches Python's stdlib ssl module (used by
+    requests/urllib3) -- yfinance's cookie/crumb auth step goes through
+    curl_cffi instead, which bundles its own separate TLS stack that
+    truststore can't reach. On this machine (Norton doing TLS inspection)
+    that showed up as yfinance calls failing with a curl_cffi
+    CertificateVerifyError ("unable to get local issuer certificate")
+    even though plain requests calls to the same Yahoo endpoints worked
+    fine. curl_cffi (like real curl) honors the CURL_CA_BUNDLE env var, so
+    fix it the same way truststore fixes the stdlib case: export Windows'
+    trusted root/CA stores (which already include whatever cert Norton
+    injects, same as the OS-native validator truststore defers to above)
+    to a PEM file and point CURL_CA_BUNDLE at it. Regenerated on every
+    import rather than cached -- ssl.enum_certificates() is fast (~63
+    certs, well under a second) and this avoids ever running on a stale
+    root store. Respects an existing CURL_CA_BUNDLE if the environment
+    already sets one. No-op on non-Windows (enum_certificates is
+    Windows-only) or if nothing intercepts traffic here."""
+    if sys.platform != "win32" or os.environ.get("CURL_CA_BUNDLE"):
+        return
+    import base64
+    import ssl
+
+    bundle_path = PROJECT_DIR / "data" / "cache" / "curl_cffi_ca_bundle.pem"
+    try:
+        bundle_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(bundle_path, "w") as f:
+            for storename in ("ROOT", "CA"):
+                for cert_der, _encoding, _trust in ssl.enum_certificates(storename):
+                    b64 = base64.b64encode(cert_der).decode("ascii")
+                    f.write("-----BEGIN CERTIFICATE-----\n")
+                    for i in range(0, len(b64), 64):
+                        f.write(b64[i:i + 64] + "\n")
+                    f.write("-----END CERTIFICATE-----\n")
+        os.environ["CURL_CA_BUNDLE"] = str(bundle_path)
+    except OSError:
+        pass  # best-effort -- curl_cffi calls just fail the same way they did before
+
+
+_ensure_curl_cffi_trusts_os_certs()
 
 # How much daily price history to backfill on first fetch.
 HISTORY_YEARS = 5
